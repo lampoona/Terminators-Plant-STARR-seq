@@ -1,0 +1,535 @@
+---
+title: "MachineLearning"
+output: html_document
+date: '2023-01-20'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+### results
+predictions <- read_tsv('/data/terminator_data_predictions.tsv') 
+colnames(predictions) <- c("id","enrichment_tobacco","enrichment_maize","set","species","prediction_tobacco","prediction_maize")
+predictions
+```
+
+```{r}
+predictions <- predictions %>%
+  pivot_longer(
+    starts_with(c('enrichment', 'prediction')),
+    names_to = c('.value', 'system'),
+    names_pattern = '(.*)_(.*)'
+  ) 
+predictions
+```
+
+```{r}
+correlation <- predictions %>%
+  group_by(system) %>%
+  summarise(
+    n = paste0('~~n == "', prettyNum(n(), big.mark = ','), '"'),
+    rsquare = sprintf('~~R^2 == "%.2f"', cor(enrichment, prediction)^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(enrichment, prediction, method = 'spearman'))
+  ) %>%
+  ungroup() %>%
+  pivot_longer(
+    c(n, spearman, rsquare),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  group_by(system) %>%
+  mutate(
+    vjust = 1.33 * seq_len(n())
+  ) %>%
+  ungroup()
+correlation
+```
+
+```{r}
+ggplot(predictions, aes(x = enrichment, y = prediction)) +
+  facet_grid(
+    cols = vars(system)
+  ) +
+  geom_hex(
+    bins = 50
+  ) +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'red',
+    linetype = 'dashed'
+  ) +
+  geom_text(
+    data = correlation,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 20/.pt,
+    parse = TRUE
+  ) +
+  scale_x_continuous(
+    name = expression(log[2]('enrichment, measured'))
+  ) +
+  scale_y_continuous(
+    name = expression(log[2]('enrichment, predicted'))
+  ) +
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  theme(
+    aspect.ratio = 1
+  ) +
+  theme_bw(
+    base_size = 22
+  )
+```
+
+
+```{r}
+predictions %>% filter(system=="tobacco") %>% 
+ggplot(aes(x = enrichment, y = prediction)) +
+ # facet_grid(
+#    cols = vars(system)
+#  ) +
+  geom_hex(
+    bins = 50
+  ) +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'red',
+    linetype = 'dashed'
+  ) +
+  geom_text(
+    data = correlation %>% filter(system=="tobacco"),
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 18/.pt,
+    parse = TRUE
+  ) +
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  ylim(c(-6,1))+
+  xlim(c(-6,1))+
+  ylab(expression(log[2]('terminator strength,predicted'))) +
+  xlab(expression(log[2]('terminator strength,measured'))) +
+  theme_classic(
+    base_size = 18
+  ) + 
+  theme(
+    aspect.ratio=1,
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  coord_fixed()
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure6A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure6A.pdf")
+```
+
+```{r}
+predictions %>% filter(system=="maize") %>% 
+ggplot(aes(x = enrichment, y = prediction)) +
+ # facet_grid(
+#    cols = vars(system)
+#  ) +
+  geom_hex(
+    bins = 50
+  ) +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'red',
+    linetype = 'dashed'
+  ) +
+  geom_text(
+    data = correlation %>% filter(system=="maize"),
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 18/.pt,
+    parse = TRUE
+  ) +
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  ylim(c(-4,.5))+
+  xlim(c(-4,.5))+
+  ylab(expression(log[2]('terminator strength,predicted'))) +
+  xlab(expression(log[2]('terminator strength,measured'))) +
+  theme_classic(
+    base_size = 18
+  ) + 
+  theme(
+    aspect.ratio=1,
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  coord_fixed()
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure6B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure6B.pdf")
+```
+
+
+
+#kmer analysis on kmer_revised.py on cluster. 
+#files were made with kmer_analysis.R on cluster
+```{r}
+data_seq_corr <- read.table("/data/data_seq_kmer_corr.tsv",header=TRUE)
+data_seq_corr
+```
+
+```{r}
+data_seq_corr %>% tail(n=10)
+```
+
+
+```{r}
+data_seq_corr %>% 
+  ggplot(aes(x=rank,y=pearson,label=kmer)) + 
+  geom_point() + 
+  theme_classic(base_size = 18) + 
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  geom_text_repel(aes(label=ifelse(pearson>.145,as.character(kmer),'')),
+                  box.padding   = 0.5, 
+                  point.padding = 0.5,
+                  size=5,
+                  segment.color = 'blue',
+                  xlim = c(500, 4000), # <--- here
+                  seed = 1,
+                  direction  = "y"
+                  #box.padding = 0.5,size=5,max.overlaps = Inf
+                  ) + 
+  geom_text_repel(aes(label=ifelse(pearson< -0.049,as.character(kmer),'')),
+                  box.padding = 0.5,
+                  max.overlaps = Inf,
+                  size=5,
+                  #box.padding   = 0.3, 
+                 # point.padding = 0.3,
+                  #size=5,
+                  segment.color = 'blue',
+                  xlim = c(NA,3500), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                  ) +
+  ylim(-.1,.25)+
+  ylab("Pearson's r") +
+  theme(
+    aspect.ratio = 1
+  ) +
+  xlab("kmer rank")  
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5A.pdf")
+```
+
+
+```{r}
+data_proto_corr <- read.table("/data/data_cor_proto_kmer_pearsons.tsv",header=TRUE)
+data_proto_corr %>% tail(30)
+```
+
+```{r}
+data_proto_corr %>% 
+  ggplot(aes(x=rank,y=pearson,label=kmer)) + 
+  geom_point() + 
+  theme_classic(base_size=18) + 
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  geom_text_repel(aes(label=ifelse(pearson>.15,as.character(kmer),'')),
+                  #box.padding = 0.5,size=5,max.overlaps = Inf
+                  box.padding   = 0.5, 
+                  point.padding = 0.5,
+                  size=5,
+                  segment.color = 'blue',
+                  xlim = c(500, 4000), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                  ) + 
+  geom_text_repel(aes(label=ifelse(pearson< -0.145,as.character(kmer),'')),
+                  #box.padding = 0.5,max.overlaps = Inf,size=5
+                  box.padding   = 0.5, 
+                  point.padding = 0.5,
+                  size=5,
+                  segment.color = 'blue',
+                  xlim = c(3500, 0), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                  ) +
+  theme(
+    aspect.ratio = 1
+  ) +
+  xlab("kmer rank") + 
+  ylab("Pearson's r") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5B.pdf")
+```
+```{r}
+data_seq_corr %>% 
+  mutate(rank_tobacco=rank) %>% 
+  inner_join(data_proto_corr,by="kmer")
+```
+
+
+
+```{r}
+kmer_diff <- data_seq_corr %>% inner_join(data_proto_corr,by="kmer") %>% mutate(diff=rank.x-rank.y) %>% arrange(desc(diff))
+
+kmer_diff
+```
+
+```{r}
+kmer_diff %>% arrange(diff) %>% head(n=10)# filter(diff<=100 & diff>=-100)
+```
+
+try normalizing pearsons on a scale of 0 to 1 
+```{r}
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+kmer_diff <- kmer_diff %>% filter(!is.na(pearson.x)) %>% filter(!is.na(pearson.y)) #%>% 
+#mutate(across(c(rank.x, rank.y), range01)) %>%
+#  mutate (diff_normal_p = rank.x-rank.y) %>%
+#  arrange(diff_normal_p) 
+
+```
+
+```{r}
+kmer_diff %>% a
+```
+
+
+```{r}
+kmer_diff %>% arrange((diff)) %>% filter(!is.na(pearson.x)) %>% tail(10) %>% pull(kmer)
+```
+
+
+```{r}
+cor(kmer_diff$rank.x, kmer_diff$rank.y, method="spearman")
+```
+
+```{r}
+kmer_diff %>% 
+  arrange(diff) %>%
+  ggplot(aes(x=rank.x,y=rank.y)) + 
+  geom_point(col="lightgray", alpha=.5) +
+  #geom_density2d() +
+  geom_point(data=kmer_diff %>% tail(n=10), col="darkgreen", alpha=.5) +
+  geom_point(data=kmer_diff %>% head(n=10), col="darkblue",alpha=.5) + 
+  xlab("6-mer rank in tobacco leaves") + ylab("6-mer rank in maize protoplasts") +
+  theme_classic(base_size=18) +
+  theme(aspect.ratio = 1)
+  coord_equal()
+  ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5C.png")
+  ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5C.pdf")
+```
+
+```{r}
+kmer_diff %>% 
+  mutate(diff_pearson = pearson.y-pearson.x) %>% arrange(desc(diff_pearson))
+```
+
+```{r}
+tmp <- kmer_diff %>% filter(!is.na(diff_pearson)) 
+cor.test(tmp$pearson.x,tmp$pearson.y)
+```
+
+
+
+```{r}
+#kmer_diff %>% head(n=20) %>% select(kmer) %>% pull()
+motif <- create_motif(kmer_diff %>% arrange(diff) %>% head(n=10) %>% select(kmer) %>% pull())
+motif <- add_multifreq(motif, sample_sites(motif))
+view_motifs(motif)
+```
+
+
+#trained a lasso regression on 70% of tobacco data and tested on 30%. code in Lasso_regression.R 
+```{r}
+lasso_on_kmers_tobacco <- read.table("/data/lasso_prediction_kmer_tobacco.tsv",header=TRUE)
+lasso_on_kmers_tobacco
+```
+
+```{r}
+cor(lasso_on_kmers_protoplasts$prediction,lasso_on_kmers_protoplasts$actual)
+```
+
+
+```{r}
+lasso_on_kmers_protoplasts <- read.table("/data/lasso_prediction_kmer_protoplasts.tsv",header=TRUE)
+lasso_on_kmers_protoplasts <- as.data.frame(lasso_on_kmers_protoplasts)
+lasso_on_kmers_protoplasts
+```
+
+```{r}
+cor.test(lasso_on_kmers_protoplasts$actual,lasso_on_kmers_protoplasts$predicted_min, method = 'pearson')
+```
+
+
+
+```{r}
+corr_lasso_proto <- lasso_on_kmers_protoplasts %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(actual, predicted_min, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(actual, predicted_min, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+corr_lasso_proto
+```
+
+
+```{r}
+library(ggpubr)
+lasso_on_kmers_protoplasts %>% 
+  ggplot(aes(x=actual,y=predicted_min)) +
+  geom_hex(
+    bins=50
+  ) + 
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) + 
+  theme_classic(
+    base_size = 18,
+  ) +
+  theme(
+    aspect.ratio=1,
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  xlim(c(-4,.5)) + 
+  ylim(c(-4,.5)) + 
+  xlab(expression(log[2]('terminator strength,measured'))) +
+  ylab(expression(log[2]('terminator strength,predicted'))) + 
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'red',
+    linetype = 'dashed'
+  ) +
+geom_text(
+    data = corr_lasso_proto,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(
+    geom="text",
+    x=-3.45,
+    y=-.30, 
+    label="n =16,526",
+    size=15/.pt
+  ) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5F.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5F.pdf")
+```
+
+
+
+```{r}
+corr_lasso_tob <- lasso_on_kmers_tobacco %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(actual, prediction, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(actual, prediction, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+corr_lasso_tob
+```
+
+
+```{r}
+lasso_on_kmers_tobacco %>% 
+  ggplot(aes(x=actual,y=prediction)) +
+  geom_hex(
+    bins=50
+  ) + 
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) + 
+  theme_classic(
+    base_size = 18,
+  ) +
+  theme(
+    aspect.ratio=1,
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  xlim(c(-6,1)) + 
+  ylim(c(-6,1)) + 
+  xlab(expression(log[2]('terminator strength,measured'))) +
+  ylab(expression(log[2]('terminator strength,predicted'))) + 
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'red',
+    linetype = 'dashed'
+  ) +
+  geom_text(
+    data = corr_lasso_tob,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(
+    geom="text",
+    x=-5.1,
+    y=-.29, 
+    label="n =16,048",
+    size=15/.pt
+  ) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5E.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure5E.pdf")
+```
+

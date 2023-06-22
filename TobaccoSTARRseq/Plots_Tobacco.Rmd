@@ -1,0 +1,1605 @@
+---
+title: "Plots_bigterm"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(PNWColors)
+library(ggsignif)
+library(stringr)
+library(readr)
+library(ggrepel)
+library(gprofiler2)
+library(Biostrings)
+library(universalmotif)
+```
+
+```{r}
+### function to display sample size on plot
+give.n <- function(x, y = -Inf, vjust = -1, size = 8/.pt){
+  return(c(y = y, vjust = vjust, size = size, label = length(x)))
+}
+```
+
+### read data
+```{r}
+load('RData/data_all.Rdata')
+load('RData/data_mean.Rdata')
+#load('RData/data_seq.Rdata')
+```
+
+```{r}
+data_all 
+```
+
+### replicate correlation
+```{r}
+data_wide <- data_all %>%
+  select(rep, light, id, variant, GC, length, enrichment) %>%
+  pivot_wider(
+    names_from = rep,
+    names_prefix = 'rep',
+    values_from = enrichment
+  )
+```
+
+
+
+Label species 
+```{r}
+data_wide <- data_wide %>% mutate(Species = case_when(
+  substr(data_wide$id,1,4) == "Arab" ~ "Arabidopsis", 
+  substr(data_wide$id,1,2) == "Zm" ~ "Maize", 
+  substr(data_wide$id,1,2) == "AT" ~ "Arabidopsis",
+  substr(data_wide$id,1,2) == "Ma" ~ "Maize",
+  substr(data_wide$id,1,1) == "t" ~ "Control",
+  substr(data_wide$id,1,2) == "GC" ~ "GC"
+  )) 
+```
+
+Label each control 
+```{r}
+data_wide <- data_wide %>% mutate(Controls = case_when(
+  grepl("_CDS",id) == TRUE ~ "CDS",
+  grepl("_Positional_random_", id) == TRUE ~ "Positional_random",
+  grepl("_ACGT_random_", id) == TRUE ~ "ACGT_random",
+  grepl("-AAAA",id) == TRUE ~ "G4-AAAA",
+  grepl("-AABB",id) == TRUE ~ "G4-AABB",
+  grepl("-ABBB",id) == TRUE ~ "G4-ABBB",
+  grepl("-BBBB",id) == TRUE ~ "G4-BBBB"
+  ))
+```
+
+Clean up the control column 
+```{r}
+data_wide <- data_wide %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "Arabidopsis"),"Gene",Controls)) %>%
+  mutate(Controls = if_else((is.na(Controls) & Species == "Maize"),"Gene",Controls)) %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "GC"),"GC",Controls)) %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "Control"),"Control",Controls)) 
+```
+
+Labeling Primary and secondary PACs
+```{r}
+data_wide <- data_wide %>% mutate(PAC = case_when(
+  (Controls=="Gene" & (grepl("_2",id) == TRUE)) ~ "Secondary",
+)) %>% 
+  mutate(PAC = if_else((is.na(PAC) & Controls =="Gene"),"Primary",PAC))
+```
+
+
+```{r}
+data_mean_2 <- data_mean %>% select(-light,-variant,-GC,-length)
+colnames(data_mean_2) <- c("id","mean_enrichment")
+data_mean_2
+data_wide
+```
+
+
+```{r}
+data_wide <- data_wide %>% select(-light)
+data_wide
+
+```
+
+```{r}
+correlation <- data_seq %>%
+#  group_by(light) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(rep1, rep2, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(rep1, rep2, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+#  group_by(light) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+```
+
+
+
+
+```{r}
+data_mean_clean <- data_wide %>% left_join(data_mean_2,by="id") %>% as.data.frame()
+data_mean_clean
+```
+
+```{r}
+sequences <- read.table("RR_genomic_terminators.fa", sep="\t",header=FALSE)
+colnames(sequences) <- c("id","seq")
+sequences$id <- gsub(">","",sequences$id)
+sequences
+```
+
+```{r}
+data_seq <- data_mean_clean %>% left_join(sequences,by="id") %>% select(-AATAAA)
+save(data_seq, file = 'RData/data_seq.Rdata')
+```
+
+
+```{r}
+ggplot(data_seq, aes(x = rep1, y = rep2)) +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'gray',
+    linetype = 'dashed'
+  ) +
+  geom_hex(bins=50)+
+  geom_point(
+    data = data_seq %>% filter(Species == 'Control'),col="red", Labels=id
+  ) +
+  geom_label_repel(data = data_seq %>% filter(Species == 'Control'),
+                  aes(label = id),
+                  box.padding   = 0.3, 
+                  point.padding = 0.3,
+                  size=6,
+                  segment.color = 'red',
+                  xlim = c(0, NA), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                 ) +
+  geom_text(
+    data = correlation,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(geom="text",label="n = 53,494",x=-5.5,y=-.3, size=5) +
+  xlim(c(-6.5,1)) +
+  ylim(c(-6.5,1)) +
+  xlab(expression(log[2]('terminator strength, rep1'))) +
+  ylab(expression(log[2]('terminator strength, rep2'))) +
+  theme_classic(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+  coord_fixed() 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.pdf")
+```
+
+
+```{r}
+level_order <- c('Gene', 'CDS', 'ACGT_random','Positional_random')
+data_seq %>%
+  filter(Species == "Arabidopsis"|
+         Species == "Maize") %>%
+  filter(Controls!= "G4-AAAA", 
+           Controls!= "G4-ABBB", 
+           Controls!= "G4-AABB",
+           Controls!= "G4-BBBB", 
+           Controls!= "GC",
+           Controls!= "Control"
+         ) %>% 
+  ggplot(aes(x=factor(Controls, level=level_order),y=mean_enrichment,fill=Controls)) +
+   facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,2.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",4)) +   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  # ) + 
+  geom_signif(comparisons = list(c("CDS","Gene")), y_position = 1.8,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("Positional_random","Gene")), y_position = .3,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("ACGT_random","Gene")), y_position = 1,
+              vjust = .1,map_signif_level = TRUE) + 
+   geom_signif(comparisons = list(c("ACGT_random","Positional_random")), y_position = 1.8,
+              vjust = .1,map_signif_level = TRUE) +
+ scale_x_discrete(labels=c("Gene" = "Terminators", "CDS" = "CDS", "ACGT_random"="Global random",
+                              "Positional_random" = "Positional random")) +
+  xlab("Controls")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1D.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1D.pdf")
+```
+
+```{r}
+data_seq_proto %>% 
+  ungroup() %>%
+  filter(Species == "Maize") %>%
+  group_by(Controls) %>%
+  summarise(median=median(mean_enrichment)) %>%
+  ungroup()
+```
+
+
+```{r}
+data_seq_proto %>%
+  ungroup() %>%
+  filter(Species == "Maize") %>%
+  filter(Controls %in% c("Gene", "CDS")) %>%
+  group_by(Controls) %>%
+  summarise(enrichment_values = list(mean_enrichment)) %>%
+ pull(enrichment_values) %>%
+{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+```{r}
+data_seq %>%
+  filter(Species == "GC") %>%
+  filter(GC %in% c(.6,.7)) %>%
+  group_by(GC) %>%
+  # summarise(median=median(mean_enrichment)) %>%
+  # ungroup()
+  summarise(enrichment_values = list(mean_enrichment)) %>%
+ pull(enrichment_values) %>%
+{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+bin by GC
+```{r}
+PNW5 <- pnw_palette("Bay",5,type="continuous")
+data_seq %>%
+  filter(Species == "GC") %>% 
+  ggplot(aes(x=as.factor(GC*100),y=mean_enrichment,fill=as.factor(GC))) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 15/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-6,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  xlab("GC %") +
+  scale_fill_manual(values = PNW5) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  geom_signif(comparisons = list(c("50","60")), y_position = -1,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("60","70")), y_position = -1,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("30","40")), y_position = -1,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("40","50")), y_position = -1,
+              vjust = .1,map_signif_level = TRUE) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure5A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure5A.pdf")
+```
+
+```{r}
+PNW7 <- pnw_palette("Bay",7,type="continuous")
+data_seq %>% mutate(GC_bin=cut(GC,breaks=seq(0, .8, .1),labels=c("0-10","11-20","21-30","31-40","41-50","51-60","61-70","71-80"))) %>% 
+  filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  ggplot(aes(x=GC_bin,y=mean_enrichment,fill=GC_bin)) +
+   facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  #ylab(expression(log[2]('enrichment'))) +
+    scale_y_continuous(
+    name = expression(log[2]('enrichment')),
+    breaks = seq(-10, 10, 2),
+    limits = c(-7,1)
+  )+
+  #ylim(c(-6.7,1.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = .6
+  ) +
+  xlab("GC %") +
+  scale_fill_manual(values = PNW7) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) + 
+  geom_signif(comparisons = list(c("11-20","21-30")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("21-30","31-40")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("31-40","41-50")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("41-50","51-60")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("51-60","61-70")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE)
+```
+
+```{r}
+data_seq %>% 
+  #filter(Species=="Maize") %>%
+  mutate(GC_bin=cut_number(GC,n=10,
+                           #labels=c("0.165-0.365","0.365-0.394","0.394-0.418","0.418-0.453","0.453-0.712")
+                           )) %>%
+  count(GC_bin) %>% 
+  pull(GC_bin)
+```
+"0.135-0.288", "0.288-0.318", "0.318-0.335", "0.335-0.353", "0.353-0.371", "0.371-0.388", "0.388-0.406", "0.406-0.429", "0.429-0.459", "0.459-0.712"
+
+```{r}
+data_seq %>% 
+  #filter(Species=="Maize") %>%
+  mutate(GC_bin=cut_number(GC,n=10,
+                           labels=c("14-29", "29-32", "32-34", "34-35", "35-37", "37-39", "39-40", "40-43", "43-46", "46-71")
+                           )) %>% 
+  #filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  ggplot(aes(x=GC_bin,y=mean_enrichment,fill=GC_bin)) +
+   #facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  #ylab(expression(log[2]('enrichment'))) +
+    scale_y_continuous(
+    name = expression(log[2]('terminator strength')),
+    breaks = seq(-10, 10, 2),
+    limits = c(-7,1)
+  )+
+  #ylim(c(-6.7,1.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = .5
+  ) +
+  xlab("GC content (%)") +
+  scale_fill_manual(values = pnw_palette("Bay",10,type="continuous")) #+   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  #  ) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.pdf")
+```
+
+```{r}
+PNW7 <- pnw_palette("Bay",7,type="continuous")
+data_seq %>% 
+  #filter(Species=="Arabidopsis") %>%
+  mutate(GC_bin=cut_number(GC,n=5,labels=c("0.135-0.288","0.288-0.312","0.312-0.335","0.335-0.359","0.359-0.588"))) %>% 
+  #filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  ggplot(aes(x=GC_bin,y=mean_enrichment,fill=GC_bin)) +
+   facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  #ylab(expression(log[2]('enrichment'))) +
+    scale_y_continuous(
+    name = expression(log[2]('enrichment')),
+    breaks = seq(-10, 10, 2),
+    limits = c(-7,1)
+  )+
+  #ylim(c(-6.7,1.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  xlab("GC %") +
+  scale_fill_manual(values = PNW7) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) + 
+  geom_signif(comparisons = list(c("0.135-0.288","0.288-0.312")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("0.288-0.312","0.312-0.335")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("0.312-0.335","0.335-0.359")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("0.335-0.359","0.359-0.588")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) 
+```
+
+
+
+```{r}
+PNW2 <- pnw_palette("Bay",2)
+data_seq %>% filter(!is.na(PAC)) %>%
+  ggplot(aes(x=PAC,y=mean_enrichment,fill=PAC)) +
+  facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('enrichment'))) +
+  ylim(c(-6,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none'
+  ) +
+  xlab("") +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  geom_signif(comparisons = list(c("Primary","Secondary")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  ggtitle("Primary PACs outperform secondary PACs")
+```
+
+
+```{r}
+primary_names <- data_seq %>% filter(!is.na(PAC)) %>% filter(PAC=="Secondary") %>% select(id)  %>% mutate(new_id = gsub("_2", "",id))
+primary_names_list <- as.array(primary_names$new_id)
+head(primary_names_list)
+primary_names
+```
+
+
+```{r}
+data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
+  mutate(id2 = gsub("_2","",id)) %>% 
+  group_by(id2,Species) %>% 
+  filter(n()==2) %>% 
+  summarize(difference = mean_enrichment[PAC=="Primary"] - mean_enrichment[PAC=="Secondary"]) 
+```
+
+
+```{r}
+PNW2 <- pnw_palette("Bay",3)
+data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
+  mutate(id2 = gsub("_2","",id)) %>% 
+  group_by(id2,Species) %>% 
+  filter(n()==2) %>% 
+  summarize(difference = mean_enrichment[PAC=="Secondary"] - mean_enrichment[PAC=="Primary"]) %>%
+  ungroup() %>%
+  ggplot(aes(x=Species,y=difference,fill=Species)) +
+ # facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("difference from Primary PAC") +
+  ylim(c(-5,4.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1.5
+  ) +
+  xlab("") +
+  scale_fill_manual(values = PNW2) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) 
+  #geom_signif(comparisons = list(c("Primary","Secondary")), y_position = 4.0,
+      #        vjust = .1,map_signif_level = TRUE) #+
+  #ggtitle("Primary PACs outperform secondary PACs")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure8A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure8A.pdf")
+```
+
+
+```{r}
+data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>%
+  filter(Species=="Arabidopsis") %>%
+  group_by(PAC) %>%
+    summarise(median=median(mean_enrichment)) %>%
+   ungroup()
+#   summarise(enrichment_values = list(mean_enrichment)) %>%
+#  pull(enrichment_values) %>%
+# {wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+```{r}
+G4_names <- data_mean_clean %>% filter(Controls=="G4-AAAA" | Controls== "G4-AABB" |Controls== "G4-ABBB"| Controls== "G4-BBBB") %>% select(id) %>% mutate(new_id = gsub('.{5}$', '',id))
+```
+
+
+```{r}
+data_seq %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  ggplot(aes(x=Controls,y=mean_enrichment,fill=Controls)) +
+  facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('enrichment'))) +
+  ylim(c(-6,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none'
+  ) +
+  xlab("") +
+  scale_fill_manual(values = pnw_palette("Bay",5)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  geom_signif(comparisons = list(c("Gene","G4-AAAA")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) + 
+  ggtitle("G4's have no effect on enrichment")
+```
+
+
+##preparing files for streme
+
+```{r}
+data_seq %>% filter(Species=="Maize") %>% 
+  slice_max(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Maize_Gene_high_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Maize_Gene_high_quartile.fa > Maize_Gene_high_quartile_cut.fa
+
+```{r}
+data_seq %>% filter(Species=="Maize") %>% 
+  slice_min(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Maize_Gene_low_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Maize_Gene_low_quartile.fa > Maize_Gene_low_quartile_cut.fa
+
+```{r}
+data_seq %>% filter(Species=="Arabidopsis") %>% 
+  slice_max(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Arabidopsis_Gene_high_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Arabidopsis_Gene_high_quartile.fa > Arabidopsis_Gene_high_quartile_cut.fa
+
+```{r}
+data_seq %>% filter(Species=="Arabidopsis") %>% 
+  slice_min(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Arabidopsis_Gene_low_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Arabidopsis_Gene_low_quartile.fa > Arabidopsis_Gene_low_quartile_cut.fa
+
+
+```{r}
+data_seq %>% filter(Species=="Arabidopsis") %>% ggplot(aes(x=mean_enrichment)) + geom_histogram(binwidth = 0.01) +
+  geom_histogram(data= data_seq %>% filter(Species=="Arabidopsis") %>% slice_min(mean_enrichment, prop=.25), aes(x=mean_enrichment),binwidth = 0.01,col="red") + 
+  geom_histogram(data= data_seq %>% filter(Species=="Arabidopsis") %>% slice_max(mean_enrichment, prop=.25),aes(x=mean_enrichment),binwidth = 0.01,col="blue") + 
+  theme_bw() + xlab(expression(Mean(log[2]('enrichment')))) +
+  ggtitle("Histogram of mean enrichment for Arabidopsis") 
+```
+
+
+
+```{r}
+data_seq %>% 
+  slice_max(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Data_Gene_high_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_high_quartile.fa > Data_Gene_high_quartile_cut.fa
+
+```{r}
+data_seq %>% 
+  slice_min(mean_enrichment, prop = 0.25) %>% select(id,seq) %>% mutate(id = gsub("^",">",id)) %>% write_tsv("FASTAs/Data_Gene_low_quartile.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_low_quartile.fa > Data_Gene_low_quartile_cut.fa
+
+
+
+doing a trimmed analysis 
+```{r}
+data_seq %>% 
+  filter(Species !="Control") %>% 
+  slice_max(mean_enrichment, prop = 0.25) %>% 
+  mutate(seq2 = str_sub(seq,1,148)) %>% 
+  select(id,seq2) %>% 
+  mutate(id = gsub("^",">",id)) %>% 
+  write_tsv("FASTAs/Data_Gene_high_quartile_trimmed.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_high_quartile_trimmed.fa > Data_Gene_high_quartile_trimmed_cut.fa
+
+```{r}
+data_seq %>% 
+  filter(Species !="Control") %>%
+  slice_min(mean_enrichment, prop = 0.25) %>% 
+  mutate(seq2 = str_sub(seq,1,148)) %>%
+  select(id,seq) %>% 
+  mutate(id = gsub("^",">",id)) %>% 
+  write_tsv("FASTAs/Data_Gene_low_quartile_trimmed.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_low_quartile_trimmed.fa > Data_Gene_low_quartile_trimmed_cut.fa
+
+
+what about the 18 bp after cleavage site
+```{r}
+data_seq %>% 
+  filter(Species !="Control") %>% 
+  slice_max(mean_enrichment, prop = 0.25) %>% 
+  mutate(seq2 = str_sub(seq,152,170)) %>% 
+  select(id,seq2) %>% 
+  mutate(id = gsub("^",">",id)) %>% 
+  write_tsv("FASTAs/Data_Gene_high_quartile_end.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_high_quartile_end.fa > Data_Gene_high_quartile_end_cut.fa
+
+```{r}
+data_seq %>% 
+  filter(Species !="Control") %>%
+  slice_min(mean_enrichment, prop = 0.25) %>% 
+  mutate(seq2 = str_sub(seq,152,170)) %>%
+  select(id,seq2) %>% 
+  mutate(id = gsub("^",">",id)) %>% 
+  write_tsv("FASTAs/Data_Gene_low_quartile_end.fa", col_names =FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' Data_Gene_low_quartile_end.fa > Data_Gene_low_quartile_end_cut.fa
+
+Your custom annotations ID is gp__MHyA_z0VS_aPs
+You can use this ID as an 'organism' name in all the related enrichment tests against this custom source.
+Just use: gost(my_genes, organism = 'gp__MHyA_z0VS_aPs')
+
+```{r}
+custom_id <- upload_GMT_file("gprofiler_full_zmays.ENSG.gmt")
+get_version_info(organism = "zmays")
+```
+
+
+```{r}
+top1_maize <- data_seq %>% filter(Species=="Maize") %>% filter(Controls=="Gene") %>%
+  slice_max(mean_enrichment, prop=.1) %>% select(id) %>% mutate(id2 = substr(id,1,14)) #%>%
+```
+
+```{r}
+gosmaize = gost(query = top1_maize$id2,
+               organism = 'gp__MHyA_z0VS_aPs')
+```
+
+```{r}
+gostplot(gosmaize, interactive = TRUE)
+```
+
+
+```{r}
+gosmaize$result %>% arrange(p_value) %>% select(term_id) %>% as.list()
+```
+
+```{r}
+p2 = gostplot(gosmaize, interactive = FALSE)
+publish_gostplot(p2, highlight_terms = c("GO:0044281", "GO:0019842", "GO:0044769", "GO:0046961", "GO:0006082", "GO:0006397" ,"GO:0019752", "GO:0030170"))
+ggsave("goterm_maize.pdf", width=10,height=8)
+```
+
+
+```{r}
+top1_arab_tobacco <- data_seq %>% filter(Species=="Arabidopsis") %>% filter(Controls=="Gene") %>%
+  slice_max(mean_enrichment, prop=.1) %>% select(id) %>% mutate(id2 = substr(id,1,9))
+top1_arab_tobacco
+```
+
+```{r}
+gosarab = gost(query = top1_arab_tobacco$id2,
+               organism = 'athaliana')
+gosarab$result %>% arrange(p_value) %>% pull(term_id) %>% head(n=10)
+```
+
+```{r}
+gostplot(gosarab, interactive = FALSE)
+```
+
+
+```{r}
+p1 = gostplot(gosarab, interactive = FALSE)
+
+publish_gostplot(p1, highlight_terms = c("GO:0050896","GO:0016491","GO:0042221","GO:0009605","GO:0006950","GO:0005737", "KEGG:01100","GO:0046906","GO:0006790","GO:0044419"))
+ggsave("Goterms_arab_tobacco.pdf",width=10,height=8)
+```
+
+
+
+
+
+## correlation between GC content and terminator strength by position (Figure 2c)
+```{r}
+window.size <- 10
+n.windows <- nchar(data_seq$seq[1]) - window.size + 1
+tmp <- data_seq %>% filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  rowwise() %>%
+  mutate(
+    GC_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"G|C")/10)) 
+```
+
+```{r}
+tmp %>% 
+  filter(Species=="Maize" | Species=="Arabidopsis") %>% 
+  select(id,Species,GC_list,mean_enrichment) %>% mutate(pos=list(seq(1,161,by=1))) %>%
+unnest(c(GC_list,pos)) %>% 
+  group_by(pos,Species) %>% 
+  summarise(
+    pearson = cor(mean_enrichment,GC_list)
+  ) %>% 
+   arrange(pos) %>%
+  ggplot() + 
+  geom_line(aes(x=pos,y=pearson,col=Species)) + 
+  scale_color_manual(values = pnw_palette("Bay",n=2,type="continuous")) +
+  ylab("Pearsons r") +
+  xlab("Position along terminator") + 
+  theme_minimal() + 
+  ggtitle("Correlation between GC content and terminator strength by position")
+```
+
+
+```{r}
+window.size <- 10
+n.windows <- nchar(data_seq$seq[1]) - window.size + 1
+tmp1 <- data_seq %>% filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  rowwise() %>%
+  mutate(
+    G_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"G")/10)) %>%
+  mutate( 
+    A_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"A")/10)) %>%
+  mutate(
+    C_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"C")/10)) %>%
+      mutate(
+    T_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"T")/10)) 
+```
+
+
+```{r}
+tmp1 %>% 
+  filter(Species=="Maize" | Species=="Arabidopsis") %>% 
+  select(id,Species,G_list,A_list,T_list,C_list,mean_enrichment) %>% mutate(pos=list(seq(1,161,by=1))) %>%
+unnest(c(G_list,A_list,C_list,T_list,pos)) %>% 
+  group_by(pos,Species) %>% 
+  summarise(
+    G = cor(mean_enrichment,G_list),
+    A = cor(mean_enrichment,A_list),
+    T = cor(mean_enrichment,T_list),
+    C = cor(mean_enrichment,C_list)
+  ) %>% 
+   arrange(pos) %>% pivot_longer(!pos & !Species, names_to ="type", values_to="pearson") %>% 
+  group_by(pos,type) %>%
+  mutate(average=mean(pearson)) %>%
+  ungroup() %>%
+  mutate(pos1=pos-150) %>%
+  ggplot() + 
+  geom_hline(yintercept = 0,col='blue',linetype='dotted') +
+  geom_line(aes(x=pos1,y=average,col=type)) + 
+  scale_color_manual(values = met.brewer("Lakota",n=4)) +
+  ylab("Pearson's R") +
+  xlab("Position relative to cleavage site") + 
+  theme_classic(base_size=18)
+  ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3D.png")
+  ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3D.pdf")
+```
+
+
+```{r}
+data_seq %>% mutate(decile=as.factor(ntile(-mean_enrichment,10))) %>% 
+ # filter(Species=="Arabidopsis") %>%
+   filter(Species=="Maize") %>%
+  ggplot(aes(x=decile,y=GC,fill=decile)) +
+  #facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("GC content") +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = .7
+  ) +
+  xlab("Decile of enrichment") +
+  scale_fill_manual(values = pnw_palette("Bay",10)) 
+```
+
+
+```{r}
+all_terms_RNA <- all_terms %>% mutate(seq2=gsub("T","U",seq))
+all.seqs.RNA <- Biostrings::RNAStringSet(deframe(select(all_terms_RNA, id, seq2)))
+all.seqs.RNA
+```
+
+#analysing streme MEME motif hits in our data 
+
+```{r}
+tobacco_meme <- read_meme('/data/misc/tobacco_RNA.meme')
+summarise_motifs(tobacco_meme)$name
+```
+
+
+get the first motif 
+```{r}
+thresh <- 0.85
+UGUA.pos <- as_tibble(scan_sequences(filter_motifs(tobacco_meme, name = "1-WUGUAAUDWWWWWWW"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+UGUA.pos
+```
+
+```{r}
+data_seq %>%
+  ungroup() %>%
+  mutate(TF=if_else(id %in% UGUA.pos$sequence,1,0)) %>%
+ group_by(TF) %>%
+  summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+  summarise(quotient = (2^(median_mean_enrichment[TF == 1] - median_mean_enrichment[TF == 0]))) %>%
+  pull(quotient)
+```
+
+
+```{r}
+UGUA.pos %>%
+  left_join(all_terms %>% mutate(sequence=id) %>% select(sequence,Species), by="sequence") 
+```
+
+
+```{r}
+UGUA.pos %>%
+  left_join(all_terms %>% mutate(sequence=id) %>% select(sequence,Species), by="sequence") %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>%
+  ggplot() + 
+  facet_grid(rows = vars(Species)) +
+  geom_histogram(aes(x=pos,fill=motif), binwidth = 1) + 
+  xlim(c(0,170)) + 
+  scale_fill_manual(values = "#27aae1") + 
+  xlab("position of motif match") + 
+  theme_classic(base_size=18) + 
+  theme(legend.position = "None",
+        aspect.ratio = .3)
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6A.pdf")
+```
+
+
+```{r}
+UGUA.pos %>% 
+  ggplot() + 
+  geom_histogram(aes(x=pos,fill=motif), binwidth = 1) + 
+  xlim(c(0,170)) + 
+  scale_fill_manual(values = "#27aae1") + 
+  xlab("position of motif match") + 
+  theme_bw(base_size=18) + 
+  theme(legend.position = "None",
+        aspect.ratio = .3)
+```
+
+
+
+```{r}
+data_seq %>% 
+  mutate(TF=if_else(id %in% UUGUUUBUWUUUUU.pos$sequence,1,0)) %>%
+  group_by(TF) %>% 
+   summarise(median=median(mean_enrichment)) %>%
+  ungroup()
+```
+```{r}
+data_seq %>% 
+  mutate(TF=if_else(id %in% UUGUUUBUWUUUUU.pos$sequence,1,0)) %>%
+  group_by(TF) %>% 
+  summarise(enrichment_values = list(mean_enrichment)) %>%
+ pull(enrichment_values) %>%
+{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+
+```{r}
+data_seq %>% 
+  mutate(TF=if_else(id %in% UGUA.pos$sequence,1,0)) %>%
+    ggplot(aes(x=as.factor(TF),y=mean_enrichment,fill=as.factor(TF))) +
+    #facet_grid(cols = vars(Species)) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 15/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 2
+  ) +
+  xlab(paste("Presence of ","UGUA")) +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  # ) + 
+  geom_signif(comparisons = list(c("1","0")), y_position = 0,
+              vjust = .1,map_signif_level = TRUE) +
+    ggtitle("UGAU")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_1.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_1.pdf")
+```
+
+
+```{r}
+thresh <- 0.85
+AAUAAA.pos <- as_tibble(scan_sequences(filter_motifs(tobacco_meme, name = "2-AAUAAAAAWAWWWWU"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+AAUAAA.pos
+```
+
+```{r}
+data_seq %>%
+  ungroup() %>%
+  mutate(TF=if_else(id %in% AAUAAA.pos$sequence,1,0)) %>%
+ group_by(TF) %>%
+  summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+  summarise(quotient = (2^(median_mean_enrichment[TF == 1] - median_mean_enrichment[TF == 0]))) %>%
+  pull(quotient)
+```
+
+
+```{r}
+AAUAAA.pos %>% 
+  left_join(all_terms %>% mutate(sequence=id) %>% select(sequence,Species), by="sequence") %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>%
+  ggplot() + 
+  facet_grid(rows = vars(Species)) +
+  geom_histogram(aes(x=pos,fill=motif), binwidth = 1) + 
+  xlim(c(0,170)) + 
+  scale_fill_manual(values = "darkorange") + 
+  xlab("position of motif match") + 
+  theme_classic(base_size=18) + 
+  theme(legend.position = "None",
+        aspect.ratio = .3)
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6C.pdf")
+```
+
+
+```{r}
+data_seq %>% 
+  mutate(TF=if_else(id %in% AAUAAA.pos$sequence,1,0)) %>%
+    ggplot(aes(x=as.factor(TF),y=mean_enrichment,fill=as.factor(TF))) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 15/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 2
+  ) +
+  xlab(paste("Presence of ","AAUAAA")) +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  # ) + 
+  geom_signif(comparisons = list(c("1","0")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+    ggtitle("AAUAAA")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_2.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_2.pdf")
+```
+"3-UUWUGUAW"
+
+```{r}
+thresh <- 0.85
+UUWUGUAW.pos <- as_tibble(scan_sequences(filter_motifs(tobacco_meme, name = "3-UUWUGUAW"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+UUWUGUAW.pos
+```
+
+
+UUGUUUBUWUUUUU
+```{r}
+thresh <- 0.85
+UUGUUUBUWUUUUU.pos <- as_tibble(scan_sequences(filter_motifs(tobacco_meme, name = "4-UUGUUUBUWUUUUU"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+UUGUUUBUWUUUUU.pos
+```
+
+
+```{r}
+data_seq %>%
+  ungroup() %>%
+  mutate(TF=if_else(id %in% UUGUUUBUWUUUUU.pos$sequence,1,0)) %>%
+ group_by(TF) %>%
+  summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+  summarise(quotient = (2^(median_mean_enrichment[TF == 1] - median_mean_enrichment[TF == 0]))) %>%
+  pull(quotient)
+```
+
+
+
+```{r}
+UUGUUUBUWUUUUU.pos %>% 
+  left_join(all_terms %>% mutate(sequence=id) %>% select(sequence,Species), by="sequence") %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>%
+  ggplot() + 
+  facet_grid(rows = vars(Species)) +
+  geom_histogram(aes(x=pos,fill=motif), binwidth = 1) + 
+  xlim(c(0,170)) + 
+  scale_fill_manual(values = pnw_palette("Bay",3)) + 
+  xlab("position of motif match") + 
+  theme_classic(base_size=18) + 
+  theme(legend.position = "None") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6E.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure6E.pdf")
+```
+
+
+
+```{r}
+UUGUUUBUWUUUUU.pos 
+```
+
+
+```{r}
+data_seq %>% 
+  mutate(TF=if_else(id %in% UUGUUUBUWUUUUU.pos$sequence,1,0)) %>%
+    ggplot(aes(x=as.factor(TF),y=mean_enrichment,fill=as.factor(TF))) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 15/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 2
+  ) +
+  xlab(paste("Presence of ","UUGUUUBUWUUUUU")) +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  # ) + 
+  geom_signif(comparisons = list(c("1","0")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+    ggtitle("UUGUUU") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_3.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4B_3.pdf") 
+```
+UUGUUUBUWUUUUU.pos
+
+combine all of them 
+```{r}
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% group_by(sequence) %>% summarize(count = n_distinct(motif)) %>% ungroup() %>% left_join(data_seq %>% select(id,mean_enrichment,Species) %>% mutate(sequence=id),by="sequence") %>% 
+  filter(Species %in% c("Arabidopsis","Maize")) %>% 
+  ggplot(aes(x=as.factor(count),y=mean_enrichment,fill=as.factor(count))) +
+    facet_grid(cols = vars(Species)) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('enrichment'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1.8
+  ) +
+  #xlab(paste("Presence of ","UUGUUUBUWUUUUU")) +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) + 
+geom_signif(comparisons = list(c("1","2")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+geom_signif(comparisons = list(c("2","3")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE)
+```
+
+
+```{r}
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
+  motif == "2-AAUAAAAAWAWWWWU" ~ "A",
+  motif == "1-WUGUAAUDWWWWWWW" ~ "B",
+  motif == "4-UUGUUUBUWUUUUU" ~ "C"
+)) %>% group_by(sequence) %>% 
+  mutate(combo = paste0(unique(mootif),collapse="+")) %>% 
+  ungroup() %>%
+  select(sequence,combo) %>%
+  filter(grepl("A",combo))
+```
+
+```{r}
+level_order = c("None","A","B","C","A+B","A+C","B+C","A+B+C")
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
+  motif == "2-AAUAAAAAWAWWWWU" ~ "A",
+  motif == "1-WUGUAAUDWWWWWWW" ~ "B",
+  motif == "4-UUGUUUBUWUUUUU" ~ "C"
+)) %>% group_by(sequence) %>% mutate(combo = paste0(unique(mootif),collapse="+")) %>% ungroup() %>% select(sequence,combo) %>% full_join(data_seq %>% mutate(sequence=id) %>% select(sequence,mean_enrichment,Species),by="sequence") %>% filter(!is.na(mean_enrichment)) %>% unique() %>% mutate(combo=if_else(is.na(combo),"None",combo)) %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>% 
+  ggplot(aes(x=factor(combo,levels=level_order),y=mean_enrichment,fill=factor(combo,levels=level_order))) +
+   # facet_grid(cols = vars(Species)) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = .7
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",8)) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4D.png") 
+``` 
+  
+
+
+
+read in conserved microRNA table 
+```{r}
+microRNA_arab <- read.table("data/misc/microRNA-ath/ath_cons.tsv", header = TRUE)
+microRNA_arab <- microRNA_arab %>% mutate (id = gsub('.{2}$', '', Target_ID))
+microRNA_arab %>% count(id)
+```
+
+```{r}
+data_seq %>% filter(Species=="Arabidopsis" & Controls=="Gene") %>% mutate ( micro_cons = if_else(id %in% microRNA_arab$id,1,0)) %>% 
+ggplot(aes(x=as.factor(micro_cons),y=mean_enrichment, fill=as.factor(micro_cons))) +
+ # facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('enrichment'))) +
+  ylim(c(-6.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none'
+  ) +
+  xlab("Presence of conserved microRNA target site") +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) + 
+  geom_signif(comparisons = list(c("1","0")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE)
+```
+
+
+
+```{r}
+microRNA_arab_deg <- read.table("data/misc/microRNA-ath/ath_deg.tsv", header = TRUE)
+microRNA_arab_deg <- microRNA_arab_deg %>% mutate (id = gsub('.{2}$', '', Target_ID))
+microRNA_arab_deg %>% count(id)
+```
+
+
+```{r}
+data_seq %>% filter(Species=="Arabidopsis" & Controls=="Gene") %>% mutate ( micro_deg = if_else(id %in% microRNA_arab_deg$id,1,0)) %>% 
+ggplot(aes(x=as.factor(micro_deg),y=mean_enrichment, fill=as.factor(micro_deg))) +
+ # facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_bw(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('enrichment'))) +
+  ylim(c(-6.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none'
+  ) +
+  xlab("Presence of degron microRNA target site") +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) + 
+  geom_signif(comparisons = list(c("1","0")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE)
+```
+
+
+
+#For exporting Supplementary Table 2 
+```{r}
+### load subassembly
+subassembly <- read_tsv('subassembly/subassembly_genomic_terminators_filtered.tsv.gz') 
+```
+
+```{r}
+nbc_tobacco <- subassembly %>%
+  filter(variant=="WT") %>% 
+  group_by(id) %>%
+  count() %>%
+  ungroup() %>%
+  rename(n_bc = n)
+```
+
+
+```{r}
+arab_bed_file <- read.table("/data/misc/Arabidopsis_PACs_Thomas_plus_TAIR.bed",header=FALSE)
+colnames(arab_bed_file) <- c("chromosome","start","stop","id","score","strand")
+arab_bed_file %>% count(chromosome)
+```
+
+```{r}
+maize_bed_file <- read.table("/data/misc/Maize_Top_PACs_Final.bed",header=FALSE)
+colnames(maize_bed_file) <- c("chromosome","start","stop","id","score","strand")
+maize_bed_file <- maize_bed_file %>% mutate(chromosome = str_replace(chromosome, "chr0", "Chr")) 
+```
+
+```{r}
+maize_CDS <- read.table("/data/misc/Maize_CDS_589_sample.bed",header=FALSE)
+colnames(maize_CDS) <- c("chromosome","start","stop","id","score","strand")
+maize_CDS <- maize_CDS %>% mutate(chromosome = str_replace(chromosome, "chr0", "Chr"))
+maize_CDS# %>% mutate(id=paste(id,"CDS",sep="_")) %>% filter(id %in% all_terms$id)
+```
+
+```{r}
+arab_CDS <- read.table("/data/misc/TAIR_CDS_589_sample.bed",header=FALSE)
+colnames(arab_CDS) <- c("chromosome","start","stop","id","score","strand")
+arab_CDS 
+```
+
+
+```{r}
+all_terms %>% 
+  left_join(data_seq %>% select(id,length,mean_enrichment) %>% rename(Tobacco_strength=mean_enrichment), by="id") %>% 
+  left_join(data_seq_proto %>% select(mean_enrichment,id) %>% rename(Protoplast_strength=mean_enrichment),by="id") %>% 
+  left_join(nbc_tobacco,by='id') %>% 
+  left_join(polyEff %>% rename(Cleavage_prob=polyEff), by='id' ) %>%
+  left_join(rbind(arab_bed_file, maize_bed_file,arab_CDS, maize_CDS), by="id") %>%
+  select(id,GC,length,Species,Controls,Tobacco_strength,Protoplast_strength,Cleavage_prob,n_bc,seq,chromosome,start,stop,strand) %>%
+ mutate(PAC = case_when(
+  (Controls=="Gene" & (grepl("_2",id) == TRUE)) ~ "Secondary",
+)) %>% 
+  mutate(PAC = if_else((is.na(PAC) & Controls =="Gene"),"Primary",PAC)) %>% write_csv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/SupplementaryTable2.csv")
+```
+
+

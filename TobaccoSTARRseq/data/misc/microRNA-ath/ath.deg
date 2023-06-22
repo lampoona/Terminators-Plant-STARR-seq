@@ -1,0 +1,2066 @@
+miRNA_ID	Target_ID	Allen_Score	P_Val
+============================================================
+ath-miR156d-5p	AT1G53160.1	0	0.00937
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       x|||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G69170.1	0	0.00247
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT2G33810.1	0	0.00888
+tar 5' UUGCUUACUCUCUUCUGUCA 3'
+       x||||o||||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT3G15270.1	0	0.01035
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       xx||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT5G50570.1	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT5G50570.2	0	0.00790
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT5G50670.1	0	0.00740
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156g	AT1G53160.1	0	0.00986
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       x|||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G69170.1	0	0.00247
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT2G33810.1	0	0.00888
+tar 5' UUGCUUACUCUCUUCUGUCA 3'
+       x||||o|||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT3G15270.1	0	0.01084
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       xx||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT5G50570.1	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT5G50570.2	0	0.00691
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT5G50670.1	0	0.00642
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156h	AT1G53160.1	0	0.00888
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       x||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G69170.1	0	0.00247
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT3G15270.1	0	0.00937
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       xx|||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT5G50570.1	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT5G50570.2	0	0.00790
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT5G50670.1	0	0.00740
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G53160.1	0	0.00050
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G69170.1	0	0.00494
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT2G33810.1	0	0.01329
+tar 5' UUGCUUACUCUCUUCUGUCA 3'
+       o||||ox|||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT3G15270.1	0	0.00937
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       |x||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT5G50570.1	0	0.00888
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT5G50570.2	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT5G50670.1	0	0.00790
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G53160.1	0	0.00888
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G69170.1	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT2G33810.1	0	0.01231
+tar 5' UUGCUUACUCUCUUCUGUCA 3'
+       x||||ox|||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT3G15270.1	0	0.00937
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       xx||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT5G50570.1	0	0.00198
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT5G50570.2	0	0.00099
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT5G50670.1	0	0.00050
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR157c-5p	AT1G27360.1	0	0.00198
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27360.2	0	0.00297
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27360.3	0	0.00346
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27360.4	0	0.00247
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27370.1	0	0.00544
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27370.2	0	0.00642
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27370.3	0	0.00396
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT1G27370.4	0	0.00593
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT2G42200.1	0	0.00494
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT3G57920.1	0	0.00445
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT5G43270.1	0	0.00149
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT5G43270.2	0	0.00050
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157c-5p	AT5G43270.3	0	0.00099
+tar 5' GUGCUCUCUCUCUUCUGUCAA 3'
+       |||||||||x|||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157d	AT1G53160.1	0	0.00888
+tar 5' CUGCUCUCUCUCUUCUGUCA 3'
+       x||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G69170.1	0	0.00247
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT3G15270.1	0	0.01084
+tar 5' CCGCUCUCUCUCUUCUGUCA 3'
+       xx|||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT5G50570.1	0	0.00839
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT5G50570.2	0	0.00790
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT5G50670.1	0	0.00740
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR159a	AT2G34010.1	0	0.00839
+tar 5' UAGAGCCCCCUUCAAACCAAA 3'
+       ||||||x||||||||x|||||   
+miR 3' AUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT2G34010.1	0	0.02688
+tar 5' UAGAGCCCCCUUCAAACCAAA 3'
+       x|||||x||||||||x|||||   
+miR 3' UUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR160b	AT1G77850.1	0	0.00050
+tar 5' UGGCAUGCAGGGAGCCAGGCA 3'
+       ||||||o||||||||||||||   
+miR 3' ACCGUAUGUCCCUCGGUCCGU 5'
+============================================================
+ath-miR160b	AT2G28350.1	0	0.00149
+tar 5' AGGAAUACAGGGAGCCAGGCA 3'
+       x||x|||||||||||||||||   
+miR 3' ACCGUAUGUCCCUCGGUCCGU 5'
+============================================================
+ath-miR160b	AT4G30080.1	0	0.00099
+tar 5' GGGUUUACAGGGAGCCAGGCA 3'
+       x||ox||||||||||||||||   
+miR 3' ACCGUAUGUCCCUCGGUCCGU 5'
+============================================================
+ath-miR161.1	AT1G64583.1	0	0.00050
+tar 5' ACCCUGAUGUUGUCACUUUCA 3'
+       ||||o|||||x||||||||||   
+miR 3' UGGGGCUACAUCAGUGAAAGU 5'
+============================================================
+ath-miR161.2	AT1G62590.1	0	0.00247
+tar 5' UAGUCACGUUCAAUGCAUUGA 3'
+       |||||||x|||||||||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR161.2	AT1G63150.1	0	0.00396
+tar 5' UUGUUACUUUCAAUGCAUUGA 3'
+       |x||o||||||||||||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR161.2	AT1G63330.1	0	0.00297
+tar 5' UAGUCACGUUCAAUGCAUUGA 3'
+       |||||||x|||||||||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR161.2	AT5G41170.1	0	0.00494
+tar 5' UAAUCACUUUCAAUGCAUUGA 3'
+       ||x||||||||||||||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR163	AT1G66700.1	0	0.00050
+tar 5' AUCG-AGUUCCAAGUCCUCUUCAA 3'
+       ||||-|||||||||||||||||||   
+miR 3' UAGCUUCAAGGUUCAGGAGAAGUU 5'
+============================================================
+ath-miR163	AT1G66700.3	0	0.00149
+tar 5' AUCG-AGUUCCAAGUCCUCUUCAA 3'
+       ||||-|||||||||||||||||||   
+miR 3' UAGCUUCAAGGUUCAGGAGAAGUU 5'
+============================================================
+ath-miR163	AT1G66720.1	0	0.00198
+tar 5' AUCG-AGUUCCAGGUCCUCUUCAA 3'
+       ||||-|||||||o|||||||||||   
+miR 3' UAGCUUCAAGGUUCAGGAGAAGUU 5'
+============================================================
+ath-miR163	AT3G44860.1	0	0.00346
+tar 5' AUCG-AGUUCCAAGUUUUCUUCAA 3'
+       ||||-||||||||||oo|||||||   
+miR 3' UAGCUUCAAGGUUCAGGAGAAGUU 5'
+============================================================
+ath-miR164a	AT1G56010.1	0	0.00346
+tar 5' AGCACGUACCCUGCUUCUCCA 3'
+       x||||||x|||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164a	AT1G56010.2	0	0.00297
+tar 5' AGCACGUACCCUGCUUCUCCA 3'
+       x||||||x|||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164a	AT3G12977.1	0	0.00396
+tar 5' AGCAUGUACCCUGCUUCUCCA 3'
+       x|||o||x|||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164a	AT5G07680.2	1	0.00055
+tar 5' UUUACGUGCCCUGCUUCUCCA 3'
+       |xo||||||||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164a	AT5G39610.1	0	0.00937
+tar 5' CUCACGUGACCUGCUUCUCCG 3'
+       xx||||||x|||||||||||o   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT1G56010.1	0	0.00346
+tar 5' AGCACGUACCCUGCUUCUCCA 3'
+       x||||||x|||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT1G56010.2	0	0.00297
+tar 5' AGCACGUACCCUGCUUCUCCA 3'
+       x||||||x|||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT3G12977.1	0	0.00445
+tar 5' AGCAUGUACCCUGCUUCUCCA 3'
+       x|||o||x|||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT5G07680.2	1	0.00055
+tar 5' UUUACGUGCCCUGCUUCUCCA 3'
+       oxo||||||||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT5G39610.1	0	0.01035
+tar 5' CUCACGUGACCUGCUUCUCCG 3'
+       |x||||||x|||||||||||o   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR165a-3p	AT1G30490.1	0	0.00149
+tar 5' UUGGGAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCCUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR165a-3p	AT2G34710.1	0	0.00050
+tar 5' UUGGGAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCCUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR165a-3p	AT5G60690.1	0	0.00099
+tar 5' CUGGGAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCCUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT1G30490.1	0	0.00297
+tar 5' UUGGGAUGAAGCCUGGUCCGG 3'
+       xx||o|||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT1G52150.1	0	0.00149
+tar 5' CUGGAAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT1G52150.2	0	0.00099
+tar 5' CUGGAAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT1G52150.3	0	0.00050
+tar 5' CUGGAAUGAAGCCUGGUCCGG 3'
+       xx||||||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT2G34710.1	0	0.00247
+tar 5' UUGGGAUGAAGCCUGGUCCGG 3'
+       xx||o|||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR166d	AT5G60690.1	0	0.00198
+tar 5' CUGGGAUGAAGCCUGGUCCGG 3'
+       xx||o|||||||||||||||o   
+miR 3' CCCCUUACUUCGGACCAGGCU 5'
+============================================================
+ath-miR167a-5p	AT5G37020.1	0	0.00149
+tar 5' UAGAUCAGGCUGGCAGCUUGU 3'
+       |||||||x|||||||||||xx   
+miR 3' AUCUAGUACGACCGUCGAAGU 5'
+============================================================
+ath-miR167a-5p	AT5G37020.2	0	0.00099
+tar 5' UAGAUCAGGCUGGCAGCUUGU 3'
+       |||||||x|||||||||||xx   
+miR 3' AUCUAGUACGACCGUCGAAGU 5'
+============================================================
+ath-miR169a-5p	AT1G17590.1	0	0.00198
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G17590.2	0	0.00149
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G17590.3	0	0.00099
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G17590.4	0	0.00050
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G54160.1	0	0.00247
+tar 5' ACGGGAAGUCAUCCUUGGCUA 3'
+       x|||x|||||||||||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G72830.1	0	0.00346
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G72830.2	0	0.00396
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT1G72830.3	0	0.00297
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT3G20910.1	0	0.00888
+tar 5' GCGGCAAUUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT5G12840.1	0	0.00790
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT5G12840.2	0	0.00839
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT5G12840.3	0	0.00691
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169a-5p	AT5G12840.4	0	0.00740
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' AGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G17590.1	0	0.00247
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G17590.2	0	0.00198
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G17590.3	0	0.00149
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G17590.4	0	0.00099
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       xx||x||||||||||||||||   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G54160.1	0	0.00050
+tar 5' ACGGGAAGUCAUCCUUGGCUA 3'
+       x|||x|||||||||||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G72830.1	0	0.00494
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G72830.2	0	0.00544
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT1G72830.3	0	0.00396
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xx||x|||||||||||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT3G20910.1	0	0.01280
+tar 5' GCGGCAAUUCAUUCUUGGCUU 3'
+       x||||||x||||o|||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT5G12840.1	0	0.00593
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       |||||||x||||o|||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT5G12840.2	0	0.00642
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       |||||||x||||o|||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT5G12840.3	0	0.00346
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       |||||||x||||o|||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169c	AT5G12840.4	0	0.00445
+tar 5' CCGGCAAAUCAUUCUUGGCUU 3'
+       |||||||x||||o|||||||x   
+miR 3' GGCCGUUCAGUAGGAACCGAC 5'
+============================================================
+ath-miR169j	AT1G17590.1	0	0.00198
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       x|||x|||||||||||||||o   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G17590.2	0	0.00149
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       x|||x|||||||||||||||o   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G17590.3	0	0.00099
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       x|||x|||||||||||||||o   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G17590.4	0	0.00050
+tar 5' AAGGGAAGUCAUCCUUGGCUG 3'
+       x|||x|||||||||||||||o   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G48500.2	1	0.02140
+tar 5' CACGCAAAGCAUCCUUGGCUC 3'
+       ||x||||xx|||||||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G48500.3	1	0.02176
+tar 5' CACGCAAAGCAUCCUUGGCUC 3'
+       ||x||||xx|||||||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G54160.1	0	0.00396
+tar 5' CGGG-AAGUCAUCCUUGGCUA 3'
+       |o||-||||||||||||||||   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G72830.1	0	0.00247
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xo||x||||||||||||||||   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G72830.2	0	0.00297
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xo||x||||||||||||||||   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT1G72830.3	0	0.00346
+tar 5' AGGGGAAGUCAUCCUUGGCUA 3'
+       xo||x||||||||||||||||   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT3G05690.1	0	0.00544
+tar 5' CAGGCAAAUCAUCUUUGGCUC 3'
+       |||||||x|||||o||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT5G06510.1	0	0.00445
+tar 5' CAGGCAAAUCAUCUUUGGCUC 3'
+       |||||||x|||||o||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT5G06510.2	0	0.00494
+tar 5' CAGGCAAAUCAUCUUUGGCUC 3'
+       |||||||x|||||o||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR169j	AT5G06510.3	0	0.00593
+tar 5' CAGGCAAAUCAUCUUUGGCUC 3'
+       |||||||x|||||o||||||x   
+miR 3' GUCCGUUCAGUAGGAACCGAU 5'
+============================================================
+ath-miR171a-3p	AT4G01910.1	1	0.00074
+tar 5' GAUGUUGGGUGCGGUUCAAUCU 3'
+       |||o||-||o||||o||||||x   
+miR 3' CUAUAA-CCGCGCCGAGUUAGU 5'
+============================================================
+ath-miR171c-3p	AT2G45160.1	0	0.00050
+tar 5' AGGGAUAUUGGCGCGGCUCAA 3'
+       x|x|||||||||o||||||||   
+miR 3' GCACUAUAACCGUGCCGAGUU 5'
+============================================================
+ath-miR171c-3p	AT3G60630.1	0	0.00149
+tar 5' AGGGAUAUUGGCGCGGCUCAA 3'
+       x|x|||||||||o||||||||   
+miR 3' GCACUAUAACCGUGCCGAGUU 5'
+============================================================
+ath-miR171c-3p	AT4G00150.1	0	0.00099
+tar 5' GGGGAUAUUGGCGCGGCUCAA 3'
+       x|x|||||||||o||||||||   
+miR 3' GCACUAUAACCGUGCCGAGUU 5'
+============================================================
+ath-miR172b-3p	AT2G28550.1	0	0.00247
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT2G28550.2	0	0.00297
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT2G28550.3	0	0.00346
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT2G39250.1	0	0.00494
+tar 5' UUGUAGCAUCAUCAGGAUUCC 3'
+       x||o||||||||||o|||||x   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT3G54990.1	0	0.00445
+tar 5' UUGCAGCAUCAUCAGGAUUCC 3'
+       x|||||||||||||o|||||x   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT4G36920.1	0	0.00149
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT4G36920.2	0	0.00198
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT5G60120.1	0	0.00050
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT5G60120.2	0	0.00099
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172b-3p	AT5G67180.1	0	0.00396
+tar 5' UGGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT2G28550.1	0	0.00297
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       |x||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT2G28550.2	0	0.00346
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       |x||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT2G28550.3	0	0.00396
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       |x||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT2G39250.1	0	0.00494
+tar 5' UUGUAGCAUCAUCAGGAUUCC 3'
+       o||o||||||||||o|||||x   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT3G54990.1	0	0.00247
+tar 5' UUGCAGCAUCAUCAGGAUUCC 3'
+       o|||||||||||||o|||||x   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT4G36920.1	0	0.00050
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT4G36920.2	0	0.00099
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT5G60120.1	0	0.00149
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT5G60120.2	0	0.00198
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172d-3p	AT5G67180.1	0	0.00445
+tar 5' UGGCAGCAUCAUCAGGAUUCU 3'
+       ox||||||||||||o||||||   
+miR 3' GACGUCGUAGUAGUUCUAAGA 5'
+============================================================
+ath-miR172e-3p	AT2G28550.1	0	0.00346
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT2G28550.2	0	0.00396
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT2G28550.3	0	0.00445
+tar 5' CAGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT2G39250.1	0	0.00198
+tar 5' UUGUAGCAUCAUCAGGAUUCC 3'
+       x||o||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT3G54990.1	0	0.00050
+tar 5' UUGCAGCAUCAUCAGGAUUCC 3'
+       x|||||||||||||o||||||   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT4G36920.1	0	0.00247
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT4G36920.2	0	0.00297
+tar 5' CUGCAGCAUCAUCAGGAUUCU 3'
+       x|||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT5G60120.1	0	0.00099
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT5G60120.2	0	0.00149
+tar 5' AUGCAGCAUCAUCAGGAUUCU 3'
+       ||||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR172e-3p	AT5G67180.1	0	0.00494
+tar 5' UGGCAGCAUCAUCAGGAUUCU 3'
+       xx||||||||||||o|||||o   
+miR 3' UACGUCGUAGUAGUUCUAAGG 5'
+============================================================
+ath-miR319a	AT1G53230.1	0	0.00937
+tar 5' AGAGGGGUCCCCUUCAGUCCAU 3'
+       ||-||o|ox||||||||||||x   
+miR 3' UC-CCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT2G31070.1	0	0.00986
+tar 5' AGGG-GUACCCUUCAGUCCAG 3'
+       ||||-|ox||||||||||||o   
+miR 3' UCCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT3G15030.1	0	0.00691
+tar 5' AGAGGGGUCCCCUUCAGUCCAG 3'
+       ||-||o|ox||||||||||||o   
+miR 3' UC-CCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT3G15030.2	0	0.00642
+tar 5' AGAGGGGUCCCCUUCAGUCCAG 3'
+       ||-||o|ox||||||||||||o   
+miR 3' UC-CCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT1G53230.1	0	0.00198
+tar 5' GAGGGGUCCCCUUCAGUCCAU 3'
+       o|||o|ox||||||||||||x   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT2G31070.1	0	0.00445
+tar 5' AAGGGGUACCCUUCAGUCCAG 3'
+       ||||o|ox||||||||||||o   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT3G15030.1	0	0.00149
+tar 5' GAGGGGUCCCCUUCAGUCCAG 3'
+       o|||o|ox||||||||||||o   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT3G15030.2	0	0.00099
+tar 5' GAGGGGUCCCCUUCAGUCCAG 3'
+       o|||o|ox||||||||||||o   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR393b-5p	AT1G12820.1	0	0.00198
+tar 5' GAAACAAUGCGAUCCCUUUGGA 3'
+       |x|x||||||||||||||||||   
+miR 3' CCUAGUUACGCUAGGGAAACCU 5'
+============================================================
+ath-miR393b-5p	AT3G23690.1	0	0.00099
+tar 5' GGGUCAGAGCGAUCCCUUUGGC 3'
+       ||o|||ox|||||||||||||x   
+miR 3' CCUAGUUACGCUAGGGAAACCU 5'
+============================================================
+ath-miR393b-5p	AT3G26810.1	0	0.00149
+tar 5' GAAACAAUGCGAUCCCUUUGGA 3'
+       |x|x||||||||||||||||||   
+miR 3' CCUAGUUACGCUAGGGAAACCU 5'
+============================================================
+ath-miR393b-5p	AT3G62980.1	0	0.00050
+tar 5' GGAGACAAUGCGAUCCCUUUGGA 3'
+       |||x-||||||||||||||||||   
+miR 3' CCUA-GUUACGCUAGGGAAACCU 5'
+============================================================
+ath-miR393b-5p	AT4G03190.1	0	0.00297
+tar 5' AGA-CCAUGCGAUCCCUUUGGA 3'
+       x||-|x||||||||||||||||   
+miR 3' CCUAGUUACGCUAGGGAAACCU 5'
+============================================================
+ath-miR394a	AT1G27340.1	0	0.00099
+tar 5' GGAGGUUGACAGAAUGCCAA 3'
+       ||||||x|||||||||||||   
+miR 3' CCUCCACCUGUCUUACGGUU 5'
+============================================================
+ath-miR395b	AT3G22890.1	0	0.00494
+tar 5' GAGUUCCUCCAAACUCUUCAU 3'
+       ||||o||o||||||x|||||x   
+miR 3' CUCAGGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR395b	AT5G10180.1	0	0.00297
+tar 5' AAGUUCUCCCAAACACUUCAA 3'
+       x|||o|o|||||||||||||x   
+miR 3' CUCAGGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR395e	AT3G22890.1	0	0.00346
+tar 5' GAGUUCCUCCAAACUCUUCAU 3'
+       |||||||o||||||x|||||x   
+miR 3' CUCAAGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR395e	AT5G10180.1	0	0.00247
+tar 5' AAGUUCUCCCAAACACUUCAA 3'
+       x|||||o|||||||||||||x   
+miR 3' CUCAAGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR396a-5p	AT2G22840.1	0	0.00198
+tar 5' UCGUUCAAGAAAGCCUGUGGAA 3'
+       ox|||||||||||-||||||||   
+miR 3' GUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396a-5p	AT2G34530.1	0	0.04361
+tar 5' GAGUUCAAGAAAGUUAUGGAA 3'
+       x||||||||||||o|x|||||   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396a-5p	AT2G36400.1	0	0.00346
+tar 5' CCGUUCAAGAAAGCCUGUGGAA 3'
+       |x|||||||||||-||||||||   
+miR 3' GUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396a-5p	AT2G45480.1	0	0.00396
+tar 5' ACGUUCAAGAAAGCUUGUGGAA 3'
+       xx||||||||||||-|||||||   
+miR 3' GUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR396a-5p	AT3G01040.1	0	0.01280
+tar 5' CAGUUCUUG-AAGCUGUGGAA 3'
+       ||||||xx|-|||||||||||   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396a-5p	AT3G01040.2	0	0.01231
+tar 5' CAGUUCUUG-AAGCUGUGGAA 3'
+       ||||||xx|-|||||||||||   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396a-5p	AT3G52910.1	0	0.00297
+tar 5' CCGUUCAAGAAAGCCUGUGGAA 3'
+       |x|||||||||||-||||||||   
+miR 3' GUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396a-5p	AT4G24150.1	0	0.00494
+tar 5' UCGUUCAAGAAAGCAUGUGGAA 3'
+       ox||||||||||||-|||||||   
+miR 3' GUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR396a-5p	AT4G37740.1	0	0.00247
+tar 5' UCGUUCAAGAAAGCCUGUGGAA 3'
+       ox|||||||||||-||||||||   
+miR 3' GUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396a-5p	AT5G01370.1	0	0.00099
+tar 5' AGGUUCGAGAAGGUUGUGGAA 3'
+       xo||||o||||o|o|||||||   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396a-5p	AT5G43060.1	0	0.00544
+tar 5' AAGAUCAAGGAAGCUGUGGGA 3'
+       x||x|||||o|||||||||o|   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT1G60140.1	0	0.03504
+tar 5' GAGUGGAAGAAAGUUGUGGAA 3'
+       o|||xx|||||||o|||||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT2G22840.1	0	0.00247
+tar 5' UCGUUCAAGAAAGCCUGUGGAA 3'
+       xx|||||||||||-||||||||   
+miR 3' UUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396b-5p	AT2G34530.1	0	0.02253
+tar 5' GAGUUCAAGAAAGUUAUGGAA 3'
+       o||||||||||||o|x|||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT2G36400.1	0	0.00198
+tar 5' CCGUUCAAGAAAGCCUGUGGAA 3'
+       xx|||||||||||-||||||||   
+miR 3' UUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396b-5p	AT2G45480.1	0	0.00346
+tar 5' ACGUUCAAGAAAGCUUGUGGAA 3'
+       |x||||||||||||-|||||||   
+miR 3' UUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR396b-5p	AT3G14110.1	0	0.04171
+tar 5' GAGUUCAAGAUAGCUUUGGAA 3'
+       o|||||||||x||||x|||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT3G14110.2	0	0.04314
+tar 5' GAGUUCAAGAUAGCUUUGGAA 3'
+       o|||||||||x||||x|||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT3G14110.3	0	0.04076
+tar 5' GAGUUCAAGAUAGCUUUGGAA 3'
+       o|||||||||x||||x|||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT3G52910.1	0	0.00149
+tar 5' CCGUUCAAGAAAGCCUGUGGAA 3'
+       xx|||||||||||-||||||||   
+miR 3' UUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396b-5p	AT4G24150.1	0	0.00396
+tar 5' UCGUUCAAGAAAGCAUGUGGAA 3'
+       xx||||||||||||-|||||||   
+miR 3' UUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR396b-5p	AT4G37740.1	0	0.00297
+tar 5' UCGUUCAAGAAAGCCUGUGGAA 3'
+       xx|||||||||||-||||||||   
+miR 3' UUCAAGUUCUUUC-GACACCUU 5'
+============================================================
+ath-miR396b-5p	AT5G01370.1	0	0.00050
+tar 5' AGGUUCGAGAAGGUUGUGGAA 3'
+       |o||||o||||o|o|||||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT5G43060.1	0	0.00099
+tar 5' AAGAUCAAGGAAGCUGUGGGA 3'
+       |||x|||||o|||||||||o|   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR397a	AT2G29130.1	1	0.00018
+tar 5' AAUCAAUGCUGCACUCAAUGA 3'
+       x|||||o||||||||||||||   
+miR 3' GUAGUUGCGACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT2G29130.1	1	0.00222
+tar 5' AAUCAAUGCUGCACUCAAUGA 3'
+       x|||||o|x||||||||||||   
+miR 3' GUAGUUGCUACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT3G60250.1	0	0.00099
+tar 5' AAUCAACGAUGCACUCAAUAA 3'
+       x||||||||||||||||||x|   
+miR 3' GUAGUUGCUACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT3G60250.2	0	0.00149
+tar 5' AAUCAACGAUGCACUCAAUAA 3'
+       x||||||||||||||||||x|   
+miR 3' GUAGUUGCUACGUGAGUUACU 5'
+============================================================
+ath-miR398a-3p	AT1G08830.1	0	0.00494
+tar 5' AAGGGGUUUCCUGAGAUCACA 3'
+       |||||||xx|||||||x||||   
+miR 3' UUCCCCACUGGACUCUUGUGU 5'
+============================================================
+ath-miR398a-3p	AT3G15640.1	0	0.00297
+tar 5' AAGGUGUGACCUGAGAAUCACA 3'
+       ||||x||||||||||||-||||   
+miR 3' UUCCCCACUGGACUCUU-GUGU 5'
+============================================================
+ath-miR398a-3p	AT3G15640.2	0	0.00247
+tar 5' AAGGUGUGACCUGAGAAUCACA 3'
+       ||||x||||||||||||-||||   
+miR 3' UUCCCCACUGGACUCUU-GUGU 5'
+============================================================
+ath-miR398c-3p	AT3G15640.1	0	0.00346
+tar 5' AAGGUGUGACCUGAGAAUCACA 3'
+       x|||x||||||||||||-||||   
+miR 3' GUCCCCACUGGACUCUU-GUGU 5'
+============================================================
+ath-miR398c-3p	AT3G15640.2	0	0.00247
+tar 5' AAGGUGUGACCUGAGAAUCACA 3'
+       x|||x||||||||||||-||||   
+miR 3' GUCCCCACUGGACUCUU-GUGU 5'
+============================================================
+ath-miR400	AT1G06580.1	0	0.00050
+tar 5' GUGACUUAUAAUACUCUCAUA 3'
+       |||||||||||||||||||||   
+miR 3' CACUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT1G62720.1	0	0.00099
+tar 5' GUGACUUAUAAUACUCUCAUU 3'
+       ||||||||||||||||||||x   
+miR 3' CACUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT1G64580.1	0	0.01084
+tar 5' GUGACCUAUAACACUCUCAUA 3'
+       |||||x|||||x|||||||||   
+miR 3' CACUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT3G16710.1	0	0.00297
+tar 5' GUGAUUUAUACUACUCUCAUA 3'
+       ||||o|||||x||||||||||   
+miR 3' CACUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT3G22470.1	0	0.00149
+tar 5' GUGACUUAUAGUAUUCUCAUA 3'
+       ||||||||||o||o|||||||   
+miR 3' CACUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT4G19440.1	0	0.00839
+tar 5' GUCGACGUAUAAUACUCUCAUA 3'
+       ||-|||x|||||||||||||||   
+miR 3' CA-CUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR400	AT4G19440.2	0	0.00888
+tar 5' GUCGACGUAUAAUACUCUCAUA 3'
+       ||-|||x|||||||||||||||   
+miR 3' CA-CUGAAUAUUAUGAGAGUAU 5'
+============================================================
+ath-miR403-3p	AT1G31280.1	0	0.00050
+tar 5' GGAGUUUGUGCGUGAAUCUAA 3'
+       x||||||||||||||||||||   
+miR 3' GCUCAAACACGCACUUAGAUU 5'
+============================================================
+ath-miR414	AT5G63740.1	0	0.04076
+tar 5' UGACGAUGAAGAUGAGGAUGA 3'
+       |||||||||x|||||o|||||   
+miR 3' ACUGCUACUACUACUUCUACU 5'
+============================================================
+ath-miR472-3p	AT5G43740.1	0	0.00050
+tar 5' GGUAUGGGGGGAGUAGGAAAAA 3'
+       ||||||||x|||||||||||||   
+miR 3' CCAUACCCGCCUCAUCCUUUUU 5'
+============================================================
+ath-miR472-3p	AT5G43740.2	0	0.00149
+tar 5' GGUAUGGGGGGAGUAGGAAAAA 3'
+       ||||||||x|||||||||||||   
+miR 3' CCAUACCCGCCUCAUCCUUUUU 5'
+============================================================
+ath-miR773b-5p	AT3G24982.1	1	0.02465
+tar 5' UGUUUG-UCAAGUUGUUGUU 3'
+       ||||||-|||||||o|||oo   
+miR 3' ACAAACGAGUUCAAUAACGG 5'
+============================================================
+ath-miR777	AT2G29710.1	1	0.00258
+tar 5' GAGCAAC--AGCUCAAUGCGUU 3'
+       o||||||--|o||||||||||x   
+miR 3' UUCGUUGCUUUGAGUUACGCAU 5'
+============================================================
+ath-miR8166	AT2G17900.1	0	0.02302
+tar 5' UGAAUCACUUUCUAUACUCUCU 3'
+       |||xxx||||||||o|||||||   
+miR 3' ACUCUUUGAAAGAUGUGAGAGA 5'
+============================================================
+ath-miR824-5p	AT3G14560.1	0	0.00297
+tar 5' UCUCUUCUCACAAAUGGCGUCUA 3'
+       ||o||||||||||||||--||||   
+miR 3' AGGGAAGAGUGUUUACC--AGAU 5'
+============================================================
+ath-miR824-5p	AT3G57230.1	0	0.00050
+tar 5' UCUCUUCUCACAAAUGGUCUA 3'
+       ||o||||||||||||||||||   
+miR 3' AGGGAAGAGUGUUUACCAGAU 5'
+============================================================
+ath-miR824-5p	AT3G57230.2	0	0.00099
+tar 5' UCUCUUCUCACAAAUGGUCUA 3'
+       ||o||||||||||||||||||   
+miR 3' AGGGAAGAGUGUUUACCAGAU 5'
+============================================================
+ath-miR827	AT1G02860.1	0	0.00050
+tar 5' UGUUUGUUGAUGGUCAUCUAA 3'
+       x||||||||||||||||||||   
+miR 3' UCAAACAACUACCAGUAGAUU 5'
+============================================================
+ath-miR827	AT1G02860.2	0	0.00099
+tar 5' UGUUUGUUGAUGGUCAUCUAA 3'
+       x||||||||||||||||||||   
+miR 3' UCAAACAACUACCAGUAGAUU 5'
+============================================================
+ath-miR838	AT5G46030.1	0	0.00198
+tar 5' UGUGCAAGAAGAGGAAGAAGA 3'
+       |||||||||||xo||||||o|   
+miR 3' ACACGUUCUUCAUCUUCUUUU 5'
+============================================================
+ath-miR158a-3p	AT2G03220.1	1	0.00110
+tar 5' UGCUUGGUCUACAUUUGGAU 3'
+       |||||x||||||||||||xx   
+miR 3' ACGAAACAGAUGUAAACCCU 5'
+============================================================
+ath-miR158b	AT2G03220.1	1	0.00183
+tar 5' UGCUUGGUCUACAUUUGGAU 3'
+       |||||x||||||||||||xx   
+miR 3' ACGAAACAGAUGUAAACCCC 5'
+============================================================
+ath-miR163	AT1G66690.1	0	0.00099
+tar 5' AUCG-AGUUCCAAGUCCUCUUCAA 3'
+       ||||-|||||||||||||||||||   
+miR 3' UAGCUUCAAGGUUCAGGAGAAGUU 5'
+============================================================
+ath-miR164a	AT5G07680.1	0	0.00246
+tar 5' UUUACGUGCCCUGCUUCUCCA 3'
+       |xo||||||||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT5G07680.1	0	0.00246
+tar 5' UUUACGUGCCCUGCUUCUCCA 3'
+       oxo||||||||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR319a	AT3G15030.3	0	0.00737
+tar 5' AGAGGGGUCCCCUUCAGUCCAG 3'
+       ||-||o|ox||||||||||||o   
+miR 3' UC-CCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT3G15030.3	0	0.00049
+tar 5' GAGGGGUCCCCUUCAGUCCAG 3'
+       o|||o|ox||||||||||||o   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR391-5p	AT1G10700.1	0	0.00197
+tar 5' UGGCGGCUAUUUCUCCGGCGAA 3'
+       ||||-|||||o|||||x|||||   
+miR 3' ACCG-CGAUAGAGAGGACGCUU 5'
+============================================================
+ath-miR391-5p	AT4G29900.1	0	0.00099
+tar 5' UGUUGCUAUCUCUCCUGCGAC 3'
+       ||xo||||||||||||||||x   
+miR 3' ACCGCGAUAGAGAGGACGCUU 5'
+============================================================
+ath-miR396a-5p	AT5G53660.1	0	0.00443
+tar 5' UCGUUCAAGAAAGCAUGUGGAA 3'
+       ox||||||||||||-|||||||   
+miR 3' GUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR396b-5p	AT5G53660.1	0	0.00443
+tar 5' UCGUUCAAGAAAGCAUGUGGAA 3'
+       xx||||||||||||-|||||||   
+miR 3' UUCAAGUUCUUUCG-ACACCUU 5'
+============================================================
+ath-miR408-3p	AT2G02850.1	0	0.00148
+tar 5' GCCAAGGGAAGAGGCAGUGCAU 3'
+       |||-||||||||||||||||||   
+miR 3' CGG-UCCCUUCUCCGUCACGUA 5'
+============================================================
+ath-miR5641	AT5G03795.1	0	0.00295
+tar 5' UGAUUCU-UCGUCUUCUUCCU 3'
+       |o|||||-||o|||||||||x   
+miR 3' AUUAAGAUAGUAGAAGAAGGU 5'
+============================================================
+ath-miR156d-5p	AT1G27360.1	0	0.00169
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27360.2	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27360.3	0	0.00084
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27360.4	0	0.00042
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27370.1	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27370.2	0	0.00337
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27370.3	0	0.00464
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT1G27370.4	0	0.00380
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT3G57920.1	1	0.00393
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156d-5p	AT5G43270.2	0	0.00253
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156g	AT1G27360.1	0	0.00169
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27360.2	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27360.3	0	0.00084
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27360.4	0	0.00042
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27370.1	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27370.2	0	0.00337
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27370.3	0	0.00464
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT1G27370.4	0	0.00380
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT3G57920.1	1	0.00454
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156g	AT5G43270.2	0	0.00253
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156h	AT1G27360.1	0	0.00169
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27360.2	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27360.3	0	0.00084
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27360.4	0	0.00042
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27370.1	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27370.2	0	0.00337
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27370.3	0	0.00464
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT1G27370.4	0	0.00380
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT3G57920.1	1	0.00393
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156h	AT5G43270.2	0	0.00253
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27360.1	0	0.00337
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27360.2	0	0.00084
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27360.3	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27360.4	0	0.00169
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27370.1	0	0.00464
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27370.2	0	0.00632
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27370.3	0	0.00380
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT1G27370.4	0	0.00590
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT3G57920.1	1	0.00393
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT5G43270.2	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27360.1	0	0.00632
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27360.2	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27360.3	0	0.00337
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27360.4	0	0.00295
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27370.1	0	0.00211
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27370.2	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27370.3	0	0.00674
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT1G27370.4	0	0.00548
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT3G57920.1	1	0.00272
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT5G43270.2	0	0.00253
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR157c-5p	AT1G53160.1	1	0.00544
+tar 5' CUGCUCUCUCUCUUCUGUCAU 3'
+       x||||||||x||||||||||x   
+miR 3' CACGAGAGAUAGAAGACAGUU 5'
+============================================================
+ath-miR157d	AT1G27360.1	0	0.00169
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27360.2	0	0.00042
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27360.3	0	0.00127
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27360.4	0	0.00084
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27370.1	0	0.00253
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27370.2	0	0.00422
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27370.3	0	0.00506
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT1G27370.4	0	0.00380
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT3G57920.1	1	0.00393
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT5G43270.2	0	0.00295
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR159a	AT3G11440.1	0	0.00084
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       |o||||||||||||x|||||x   
+miR 3' AUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159a	AT4G27330.1	0	0.00674
+tar 5' AUGAGCUCUCUUCAAUCUCAAA 3'
+       xx||||||o||||||||-||||   
+miR 3' AUCUCGAGGGAAGUUAG-GUUU 5'
+============================================================
+ath-miR159a	AT5G06100.1	0	0.00169
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       |o||||||||||||x|||||x   
+miR 3' AUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159a	AT5G06100.2	0	0.00211
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       |o||||||||||||x|||||x   
+miR 3' AUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159a	AT5G06100.3	0	0.00127
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       |o||||||||||||x|||||x   
+miR 3' AUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT3G11440.1	0	0.00084
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       xo||||||||||||x|||||x   
+miR 3' UUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT4G27330.1	0	0.00674
+tar 5' AUGAGCUCUCUUCAAUCUCAAA 3'
+       |x||||||o||||||||-||||   
+miR 3' UUCUCGAGGGAAGUUAG-GUUU 5'
+============================================================
+ath-miR159b-3p	AT5G06100.1	0	0.00169
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       xo||||||||||||x|||||x   
+miR 3' UUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT5G06100.2	0	0.00211
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       xo||||||||||||x|||||x   
+miR 3' UUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT5G06100.3	0	0.00127
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       xo||||||||||||x|||||x   
+miR 3' UUCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159c	AT3G11440.1	0	0.00169
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       x|||||||||||||x|||||x   
+miR 3' UCCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159c	AT4G27330.1	0	0.02256
+tar 5' AUGAGCUCUCUUCAAUCUCAAA 3'
+       |x||||||o||||||||-||||   
+miR 3' UCCUCGAGGGAAGUUAG-GUUU 5'
+============================================================
+ath-miR159c	AT5G06100.1	0	0.00084
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       x|||||||||||||x|||||x   
+miR 3' UCCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159c	AT5G06100.2	0	0.00127
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       x|||||||||||||x|||||x   
+miR 3' UCCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR159c	AT5G06100.3	0	0.00211
+tar 5' UGGAGCUCCCUUCAUUCCAAU 3'
+       x|||||||||||||x|||||x   
+miR 3' UCCUCGAGGGAAGUUAGGUUU 5'
+============================================================
+ath-miR161.1	AT1G06580.1	0	0.00337
+tar 5' GCCCGGAUGUAAUCACUUUCA 3'
+       o|||x||||||x|||||||||   
+miR 3' UGGGGCUACAUCAGUGAAAGU 5'
+============================================================
+ath-miR161.2	AT1G62910.1	2	0.03831
+tar 5' UAGUCACUUUCAGCGCAUUGA 3'
+       ||||||||||||ox|||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR161.2	AT1G62914.1	2	0.01934
+tar 5' UAGUCACUUUCAGCGCAUUGA 3'
+       ||||||||||||ox|||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR162a-3p	AT1G01040.1	0	0.00042
+tar 5' CUGGAUGCAGAGGUAUUAUCGA 3'
+       ||||||||||||||-|||||||   
+miR 3' GACCUACGUCUCCA-AAUAGCU 5'
+============================================================
+ath-miR164a	AT3G15170.1	0	0.00042
+tar 5' AGCACGUGUCCUGUUUCUCCA 3'
+       x|||||||o||||o|||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164a	AT5G53950.1	0	0.00084
+tar 5' AGCACGUGUCCUGUUUCUCCA 3'
+       x|||||||o||||o|||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT3G15170.1	0	0.00042
+tar 5' AGCACGUGUCCUGUUUCUCCA 3'
+       x|||||||o||||o|||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT5G53950.1	0	0.00084
+tar 5' AGCACGUGUCCUGUUUCUCCA 3'
+       x|||||||o||||o|||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR170-3p	AT2G45160.1	0	0.00084
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||o|o|||||||||||   
+miR 3' CUAUAACUGUGCCGAGUUAGU 5'
+============================================================
+ath-miR170-3p	AT3G60630.1	0	0.00127
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||o|o|||||||||||   
+miR 3' CUAUAACUGUGCCGAGUUAGU 5'
+============================================================
+ath-miR170-3p	AT4G00150.1	0	0.00042
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||o|o|||||||||||   
+miR 3' CUAUAACUGUGCCGAGUUAGU 5'
+============================================================
+ath-miR171a-3p	AT2G45160.1	0	0.00084
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||||||||||||||||   
+miR 3' CUAUAACCGCGCCGAGUUAGU 5'
+============================================================
+ath-miR171a-3p	AT3G60630.1	0	0.00127
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||||||||||||||||   
+miR 3' CUAUAACCGCGCCGAGUUAGU 5'
+============================================================
+ath-miR171a-3p	AT4G00150.1	0	0.00042
+tar 5' GAUAUUGGCGCGGCUCAAUCA 3'
+       |||||||||||||||||||||   
+miR 3' CUAUAACCGCGCCGAGUUAGU 5'
+============================================================
+ath-miR2939	AT3G19890.1	0	0.00042
+tar 5' AUGGUUUAGUGUUGUGCGUUC 3'
+       ||||o|||||||||||||||x   
+miR 3' UACCGAAUCACAACACGCAAU 5'
+============================================================
+ath-miR319a	AT1G30210.1	0	0.00422
+tar 5' AGGGGGA-CCCUUCAGUCCAA 3'
+       ||||o|x-|||||||||||||   
+miR 3' UCCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT1G30210.2	0	0.00464
+tar 5' AGGGGGA-CCCUUCAGUCCAA 3'
+       ||||o|x-|||||||||||||   
+miR 3' UCCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT4G18390.1	0	0.00380
+tar 5' AGGGGGA-CCCUUCAGUCCAA 3'
+       ||||o|x-|||||||||||||   
+miR 3' UCCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319a	AT4G18390.2	0	0.00295
+tar 5' AGGGGGA-CCCUUCAGUCCAA 3'
+       ||||o|x-|||||||||||||   
+miR 3' UCCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT1G30210.1	0	0.00632
+tar 5' UAGGGGGACCCUUCAGUCCAA 3'
+       x|||o|xx|||||||||||||   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT1G30210.2	0	0.00590
+tar 5' UAGGGGGACCCUUCAGUCCAA 3'
+       x|||o|xx|||||||||||||   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT4G18390.1	0	0.00548
+tar 5' CAGGGGGACCCUUCAGUCCAA 3'
+       x|||o|xx|||||||||||||   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR319c	AT4G18390.2	0	0.00506
+tar 5' CAGGGGGACCCUUCAGUCCAA 3'
+       x|||o|xx|||||||||||||   
+miR 3' UUCCUCGAGGGAAGUCAGGUU 5'
+============================================================
+ath-miR393b-3p	AT1G02660.1	1	0.03250
+tar 5' AAUCCAAAGAGA-C-CAUGAU 3'
+       ||||||||||||-|-||||||   
+miR 3' UUAGGUUUCUCUAGCGUACUA 5'
+============================================================
+ath-miR395b	AT5G43780.1	2	0.03831
+tar 5' GAGUUCCUCCAAACACUUCAU 3'
+       ||||o||o||||||||||||x   
+miR 3' CUCAGGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR395e	AT5G43780.1	2	0.01934
+tar 5' GAGUUCCUCCAAACACUUCAU 3'
+       |||||||o||||||||||||x   
+miR 3' CUCAAGGGGGUUUGUGAAGUC 5'
+============================================================
+ath-miR397a	AT2G38080.1	0	0.00084
+tar 5' AGUCAACGCUGCACUUAAUGA 3'
+       xo|||||||||||||o|||||   
+miR 3' GUAGUUGCGACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT2G38080.1	0	0.00716
+tar 5' AGUCAACGCUGCACUUAAUGA 3'
+       xo||||||x||||||o|||||   
+miR 3' GUAGUUGCUACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT3G57870.1	2	0.01934
+tar 5' CAUUAACGAUGCACUUCAGUGA 3'
+       |||o||||||||||-|||o|||   
+miR 3' GUAGUUGCUACGUG-AGUUACU 5'
+============================================================
+ath-miR399a	AT2G33770.1	2	0.03831
+tar 5' UAGGGCAAAUCUUCUUUGGCA 3'
+       o|||||||||||o||||||||   
+miR 3' GUCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399c-3p	AT2G33770.1	2	0.01934
+tar 5' UAGGGCAUAUCUCCUUUGGCA 3'
+       o||||||xx||||||||||||   
+miR 3' GUCCCGUUGAGAGGAAACCGU 5'
+============================================================
+ath-miR399e	AT2G33770.1	2	0.03831
+tar 5' CGA-GCAAAUCUCCUUUGGCA 3'
+       |||-|||||||||||||||||   
+miR 3' GCUCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399f	AT2G33770.1	2	0.03831
+tar 5' UAGGGCAAAUCUUCUUUGGCA 3'
+       ox||||||||||o||||||||   
+miR 3' GGCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR403-3p	AT4G21510.1	2	0.03831
+tar 5' CGAGUUGUGUGCGUGAAUCUCU 3'
+       ||||||-|||||||||||||xx   
+miR 3' GCUCAA-ACACGCACUUAGAUU 5'
+============================================================
+ath-miR472-3p	AT5G43730.1	0	0.00758
+tar 5' GGUAUGGGGGGAAUAGGAAAAA 3'
+       ||||||||x|||x|||||||||   
+miR 3' CCAUACCCGCCUCAUCCUUUUU 5'
+============================================================
+ath-miR5014a-3p	AT5G57700.3	2	0.03831
+tar 5' CGUGAACUUGGAUUUGUACGA 3'
+       |||ox||||oo||||||||o|   
+miR 3' GCAUGUGAAUUUAAACAUGUU 5'
+============================================================
+ath-miR8182	AT5G65020.2	2	0.03831
+tar 5' GCUC-ACAGGAACGCAGCACAA 3'
+       ox||-||||o||||||o|||||   
+miR 3' UUAGUUGUCUUUGCGUUGUGUU 5'
+============================================================
+ath-miR823	AT1G69770.1	0	0.00042
+tar 5' GUCUUAUAUGAUCAUCACCCU 3'
+       o|||||||||||||o|||||x   
+miR 3' UAGAAUAUACUAGUGGUGGGU 5'
+============================================================
+ath-miR858a	AT1G06180.1	0	0.00380
+tar 5' CUGGACGAACAGACAACGAAA 3'
+       xx||x||||||||||||||||   
+miR 3' UUCCAGCUUGUCUGUUGCUUU 5'
+============================================================
+ath-miR858a	AT1G66230.1	1	0.00484
+tar 5' CAGGAAGAACAGACAACGAAA 3'
+       x|||xx|||||||||||||||   
+miR 3' UUCCAGCUUGUCUGUUGCUUU 5'
+============================================================
+ath-miR858a	AT2G47460.1	0	0.00211
+tar 5' CAGGGAGAACAGACAACGAAA 3'
+       x|||xx|||||||||||||||   
+miR 3' UUCCAGCUUGUCUGUUGCUUU 5'
+============================================================
+ath-miR858a	AT5G49330.1	0	0.00800
+tar 5' CAGGAAGAACAGACAACGAAA 3'
+       x|||xx|||||||||||||||   
+miR 3' UUCCAGCUUGUCUGUUGCUUU 5'
+============================================================
+ath-miR859	AT3G21170.1	1	0.00635
+tar 5' UUUGAUUUCUCAACAGAGAGA 3'
+       |||||o|||x|||||||||||   
+miR 3' AAACUGAAGUGUUGUCUCUCU 5'
+============================================================
+ath-miR860	AT5G26030.1	2	0.01934
+tar 5' AUAUAUAGUCCAAUCUAUUGA 3'
+       |||o|||||||||||||||||   
+miR 3' UAUGUAUCAGGUUAGAUAACU 5'
+============================================================
+ath-miR156d-5p	AT5G43270.1	0	0.00375
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x|||||||||||||   
+miR 3' CACGAGUGAGAGAAGACAGU 5'
+============================================================
+ath-miR156g	AT5G43270.1	0	0.00375
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||x||||||||||||x   
+miR 3' CACGAGUGAGAGAAGACAGC 5'
+============================================================
+ath-miR156h	AT5G43270.1	0	0.00375
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAAAGAAGACAGU 5'
+============================================================
+ath-miR156i	AT5G43270.1	0	0.00262
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       x|||||||||||||||||||   
+miR 3' GACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR156j	AT5G43270.1	0	0.00524
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       ||||||||||||||||||||   
+miR 3' CACGAGAGAGAGAAGACAGU 5'
+============================================================
+ath-miR157d	AT5G43270.1	0	0.00412
+tar 5' GUGCUCUCUCUCUUCUGUCA 3'
+       |||||||||x||||||||||   
+miR 3' CACGAGAGAUAGAAGACAGU 5'
+============================================================
+ath-miR159a	AT4G15530.6	1	0.01133
+tar 5' AAGAGUUUCCUUCAGAUCCAAA 3'
+       x||||o|o||||||-|||||||   
+miR 3' AUCUCGAGGGAAGU-UAGGUUU 5'
+============================================================
+ath-miR159b-3p	AT4G15530.6	1	0.00938
+tar 5' AAGAGUUUCCUUCAGAUCCAAA 3'
+       |||||o|o||||||-|||||||   
+miR 3' UUCUCGAGGGAAGU-UAGGUUU 5'
+============================================================
+ath-miR161.1	AT1G62670.1	2	0.04719
+tar 5' ACCCUGAUGUAUUCACUUUCA 3'
+       ||||o||||||x|||||||||   
+miR 3' UGGGGCUACAUCAGUGAAAGU 5'
+============================================================
+ath-miR161.2	AT1G62930.1	2	0.04719
+tar 5' UAGUCACUUUCAGCGCAUUGA 3'
+       ||||||||||||ox|||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR161.2	AT1G63400.1	0	0.00262
+tar 5' UAGUCACUUUCAACGCAUUGA 3'
+       |||||||||||||x|||||||   
+miR 3' AUCAGUGAAAGUUACGUAACU 5'
+============================================================
+ath-miR164a	AT5G61430.1	0	0.00150
+tar 5' UCUACGUGCCCUGCUUCUCCA 3'
+       |xo||||||||||||||||||   
+miR 3' ACGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR164c-5p	AT5G61430.1	0	0.00150
+tar 5' UCUACGUGCCCUGCUUCUCCA 3'
+       oxo||||||||||||||||||   
+miR 3' GCGUGCACGGGACGAAGAGGU 5'
+============================================================
+ath-miR1886.1	AT2G47940.1	0	0.00748
+tar 5' UCUUUCUUCUCACUUCUCUCU 3'
+       xx||||x|||||||||||||x   
+miR 3' CUAAAGUAGAGUGAAGAGAGU 5'
+============================================================
+ath-miR1886.1	AT2G47940.2	0	0.00710
+tar 5' UCUUUCUUCUCACUUCUCUCU 3'
+       xx||||x|||||||||||||x   
+miR 3' CUAAAGUAGAGUGAAGAGAGU 5'
+============================================================
+ath-miR2112-3p	AT4G00760.1	2	0.01599
+tar 5' UACGCAAAUGCGGAUAUAAAG 3'
+       |x|||||||||||||||||||   
+miR 3' ACGCGUUUACGCCUAUAUUUC 5'
+============================================================
+ath-miR2938	AT4G08870.2	2	0.01599
+tar 5' AUGCGAACCUUCUCAAAAGAUC 3'
+       x||-|||||o||||||||||||   
+miR 3' GAC-CUUGGGAGAGUUUUCUAG 5'
+============================================================
+ath-miR390a-5p	AT3G24660.1	1	0.02903
+tar 5' GGU-CAAUCCCUCUUGAGCUU 3'
+       ||o-|x|||||||o|||||||   
+miR 3' CCGCGAUAGGGAGGACUCGAA 5'
+============================================================
+ath-miR396a-5p	AT2G34530.2	0	0.03175
+tar 5' GAGUUCAAGAAAGUUAUGGAA 3'
+       x||||||||||||o|x|||||   
+miR 3' GUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR396b-5p	AT2G34530.2	0	0.01748
+tar 5' GAGUUCAAGAAAGUUAUGGAA 3'
+       o||||||||||||o|x|||||   
+miR 3' UUCAAGUUCUUUCGACACCUU 5'
+============================================================
+ath-miR397a	AT5G60020.1	0	0.00150
+tar 5' AAUCAAUGCUGCACUUAAUGA 3'
+       x|||||o||||||||o|||||   
+miR 3' GUAGUUGCGACGUGAGUUACU 5'
+============================================================
+ath-miR397b	AT5G60020.1	0	0.01194
+tar 5' AAUCAAUGCUGCACUUAAUGA 3'
+       x|||||o|x||||||o|||||   
+miR 3' GUAGUUGCUACGUGAGUUACU 5'
+============================================================
+ath-miR398a-3p	AT5G14550.1	2	0.01599
+tar 5' CAGGGGUGACCUGAGAACACA 3'
+       x||||||||||||||||||||   
+miR 3' UUCCCCACUGGACUCUUGUGU 5'
+============================================================
+ath-miR398c-3p	AT3G06370.1	1	0.00118
+tar 5' UAGGGGUGACUUGAGUACACC 3'
+       o|||||||||o||||x||||x   
+miR 3' GUCCCCACUGGACUCUUGUGU 5'
+============================================================
+ath-miR398c-3p	AT5G14550.1	2	0.01599
+tar 5' CAGGGGUGACCUGAGAACACA 3'
+       |||||||||||||||||||||   
+miR 3' GUCCCCACUGGACUCUUGUGU 5'
+============================================================
+ath-miR399a	AT2G33770.1	2	0.04719
+tar 5' UAGGGCAUAUCUCCUUUGGCA 3'
+       o||||||x|||||||||||||   
+miR 3' GUCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399a	AT2G33770.1	2	0.01599
+tar 5' UUGGGCAAAUCUCCUUUGGCA 3'
+       ox|||||||||||||||||||   
+miR 3' GUCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399c-3p	AT2G33770.1	2	0.03172
+tar 5' UUGGGCAAAUCUCCUUUGGCA 3'
+       ox||||||x||||||||||||   
+miR 3' GUCCCGUUGAGAGGAAACCGU 5'
+============================================================
+ath-miR399d	AT2G33770.1	2	0.01599
+tar 5' UUGGGCAAAUCUCCUUUGGCA 3'
+       ox|||||||||||||||||||   
+miR 3' GCCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399e	AT2G33770.1	2	0.01599
+tar 5' UUGGGCAAAUCUCCUUUGGCA 3'
+       oxo||||||||||||||||||   
+miR 3' GCUCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399f	AT2G33770.1	2	0.04719
+tar 5' UAGGGCAUAUCUCCUUUGGCA 3'
+       ox|||||x|||||||||||||   
+miR 3' GGCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR399f	AT2G33770.1	2	0.01599
+tar 5' UUGGGCAAAUCUCCUUUGGCA 3'
+       oo|||||||||||||||||||   
+miR 3' GGCCCGUUUAGAGGAAACCGU 5'
+============================================================
+ath-miR402	AT4G34060.2	0	0.00038
+tar 5' CUGAGGUUUAAUAGGCCUCGGA 3'
+       |x||||||||||||||||||o|   
+miR 3' GUCUCCAAAUUAUCCGGAGCUU 5'
+============================================================
+ath-miR408-3p	AT2G47020.1	2	0.03172
+tar 5' GCCAGGGAAGAGGCAGUGCAU 3'
+       |||||||||||||||||||||   
+miR 3' CGGUCCCUUCUCCGUCACGUA 5'
+============================================================
+ath-miR408-5p	AT2G47020.1	2	0.01599
+tar 5' CAUGCUCUGCUUGUUCCCUGU 3'
+       |||||||||||||||||||||   
+miR 3' GUACGAGACGAACAAGGGACA 5'
+============================================================
+ath-miR415	AT5G17580.1	0	0.00113
+tar 5' AUGUUCUGUUCUUGCUCUGUU 3'
+       ||||||||||xo|||||||||   
+miR 3' UACAAGACAAAGACGAGACAA 5'
+============================================================
+ath-miR5022	AT5G52060.1	2	0.01599
+tar 5' CAUUCGAUCAUCAUCCCGUGAC 3'
+       |||||||||||-|o|||o||||   
+miR 3' GUAAGCUAGUA-UGGGGUACUG 5'
+============================================================
+ath-miR5630b	AT1G33140.1	2	0.01599
+tar 5' UCCAUCAGAACCGCUCUUAGC 3'
+       |||||||||||||||||||||   
+miR 3' AGGUAGUCUUGGCGAGAAUCG 5'
+============================================================
+ath-miR5657	AT5G27660.1	2	0.01599
+tar 5' CACCAAAUCUAACCUUGUCCA 3'
+       |||||||||||||||||||||   
+miR 3' GUGGUUUAGAUUGGAACAGGU 5'
+============================================================
+ath-miR5663-5p	AT3G56190.1	2	0.03172
+tar 5' CGGGAAUGCAAGUUCUUAGCG 3'
+       x|o||||||||o|o||||||x   
+miR 3' ACUCUUACGUUUAGGAAUCGA 5'
+============================================================
+ath-miR5663-5p	AT3G56190.2	2	0.04719
+tar 5' CGGGAAUGCAAGUUCUUAGCG 3'
+       x|o||||||||o|o||||||x   
+miR 3' ACUCUUACGUUUAGGAAUCGA 5'
+============================================================
+ath-miR775	AT1G53290.1	2	0.04719
+tar 5' UCGUACUGCUAGAUAUCGAA 3'
+       |x|o|||||||||o||||||   
+miR 3' ACCGUGACGAUCUGUAGCUU 5'
+============================================================
+ath-miR778	AT2G22740.1	1	0.00039
+tar 5' UGGUAUACAUAAACCAAGCCA 3'
+       o|||x||||||||||||||||   
+miR 3' GCCACAUGUAUUUGGUUCGGU 5'
+============================================================
+ath-miR835-3p	AT5G46170.1	2	0.03172
+tar 5' CUUUCAUGCGUUAUCUUCUCCA 3'
+       |||||x||||-|||||||||||   
+miR 3' GAAAGAACGC-AUAGAAGAGGU 5'
+============================================================
+ath-miR858a	AT3G61250.1	0	0.00487
+tar 5' CAGGAAGAACAGACAACGAGA 3'
+       x|||xx|||||||||||||o|   
+miR 3' UUCCAGCUUGUCUGUUGCUUU 5'
+============================================================
+ath-miR858b	AT5G49330.1	0	0.01119
+tar 5' CCAGGAAGAACAGACAACGAA 3'
+       |x|||xx||||||||||||||   
+miR 3' GUUCCAGCUUGUCUGUUGCUU 5'
+============================================================
+ath-miR866-3p	AT4G21400.1	2	0.01599
+tar 5' UCUUCAAUGAUGGAUUUUGU 3'
+       |||||||x||o|||||||||   
+miR 3' AGAAGUUUCUGCCUAAAACA 5'

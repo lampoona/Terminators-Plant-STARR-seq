@@ -1,0 +1,165 @@
+==================================================
+ath-miR161.1	Chr1:23413244-23413979 (+)
+tar  5' AUCCAAAUGUAGUCACUUUCA 3'
+        |o||  |||||||||||||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.1	Chr1:23419795-23420467 (+)
+tar  5' ACCCCAAUGUUGUUACUUUCA 3'
+        ||||| |||| ||o|||||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.2	Chr1:23413244-23413979 (+)
+tar  5' UAGUCACUUUCAGCGCAUUGA 3'
+        ||||||||||||o |||||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR161.2	Chr1:23419795-23420467 (+)
+tar  5' UUGUUACUUUCAAUGCAUUGA 3'
+        | ||o||||||||||||||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR173-5p	Chr2:11721568-11722408 (-)
+tar  5' GUGAUUUUUCUCUACAAGCGAA 3'
+        |||||||o||||| ||||||||
+mir  3' CACUAAAGAGAGACGUUCGCUU 5'
+==================================================
+ath-miR173-5p	Chr2:16537376-16538300 (-)
+tar  5' GUGAUUUUUCUCUACAAGCGAA 3'
+        |||||||o||||| ||||||||
+mir  3' CACUAAAGAGAGACGUUCGCUU 5'
+==================================================
+ath-miR173-5p	Chr2:16539520-16540360 (-)
+tar  5' GUGAUUUUUCUCUCCAAGCGAA 3'
+        |||||||o||||| ||||||||
+mir  3' CACUAAAGAGAGACGUUCGCUU 5'
+==================================================
+ath-miR390a-5p	Chr3:5861954-5862647 (+)
+tar  5' GGUGUUAUCCUAUCUGAGCUU 3'
+        ||o|o|||||o o||||||||
+mir  3' CCGCGAUAGGGAGGACUCGAA 5'
+==================================================
+ath-miR390a-5p	Chr3:5861954-5862647 (+)
+tar  5' UUGUCUAUCCCUCCUGAGCUA 3'
+            |||||||||||||||| 
+mir  3' CCGCGAUAGGGAGGACUCGAA 5'
+==================================================
+ath-miR393b-5p	Chr1:4368719-4369412 (-)
+tar  5' GAAACAAUGCGAUCCCUUUGGA 3'
+        | | ||||||||||||||||||
+mir  3' CCUAGUUACGCUAGGGAAACCU 5'
+==================================================
+ath-miR161.1	Chr1:23451039-23451732 (+)
+tar  5' AUCCUGAUGUUGUAACUUUCA 3'
+        |o||o||||| || |||||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.2	Chr1:23451039-23451732 (+)
+tar  5' UUGUAACUUUCAGUGCAUUGA 3'
+        | || |||||||o||||||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR393b-5p	Chr3:9870061-9870712 (+)
+tar  5' GAAACAAUGCGAUCCCUUUGGA 3'
+        | | ||||||||||||||||||
+mir  3' CCUAGUUACGCUAGGGAAACCU 5'
+==================================================
+ath-miR400	Chr1:23413202-23414063 (+)
+tar  5' GUGACUUACAAUACUCUUAUA 3'
+        |||||||| ||||||||o|||
+mir  3' CACUGAAUAUUAUGAGAGUAU 5'
+==================================================
+ath-miR400	Chr1:23419753-23420635 (+)
+tar  5' CAGACUUAUAAUACGCUUAUA 3'
+          |||||||||||| ||o|||
+mir  3' CACUGAAUAUUAUGAGAGUAU 5'
+==================================================
+ath-miR472-3p	Chr5:17566407-17567058 (+)
+tar  5' GGUAUGGGGGGAGUAGGAAAAA 3'
+        |||||||| |||||||||||||
+mir  3' CCAUACCCGCCUCAUCCUUUUU 5'
+==================================================
+ath-miR5024-5p	Chr3:6915488-6916160 (+)
+tar  5' UGUGGU-UCUUGUCCUUGUCGU 3'
+        ||| o| ||||| |||||||o|
+mir  3' ACAAUAUAGAACCGGAACAGUA 5'
+==================================================
+ath-miR828	Chr3:9417527-9418178 (-)
+tar  5' UGGAAUACUCAUUUGAGCAAGA 3'
+        ||||||||||||||o|||||||
+mir  3' ACCUUAUGAGUAAAUUCGUUCU 5'
+==================================================
+ath-miR161.1	Chr1:23299393-23300317 (+)
+tar  5' AUCCAAAUGUAGUCACUUUCA 3'
+        |o||  |||||||||||||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.2	Chr1:23299393-23300317 (+)
+tar  5' UAGUCACUUUCAGCGCAUUGA 3'
+        ||||||||||||o |||||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR400	Chr1:23299393-23300317 (+)
+tar  5' GUGACUUACAGUACUCUUAUA 3'
+        |||||||| |o||||||o|||
+mir  3' CACUGAAUAUUAUGAGAGUAU 5'
+==================================================
+ath-miR838	Chr1:27709-28360 (+)
+tar  5' UGAGAAGGAAGUAGAAGAGGA 3'
+        || | |o|||||||||||oo|
+mir  3' ACACGUUCUUCAUCUUCUUUU 5'
+==================================================
+ath-miR161.1	Chr5:5461423-5462095 (+)
+tar  5' ACCCUGAUGUAUUUACUUUCA 3'
+        ||||o|||||| |o|||||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.2	Chr5:5461423-5462095 (+)
+tar  5' UAUUUACUUUCAAUGCGUUGA 3'
+        || |o|||||||||||o||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR390a-5p	Chr5:23394076-23394727 (+)
+tar  5' GUUUCUAUUCCUCCUGAGCUU 3'
+        | o ||||o||||||||||||
+mir  3' CCGCGAUAGGGAGGACUCGAA 5'
+==================================================
+ath-miR393b-5p	Chr3:23273318-23273969 (-)
+tar  5' GAGACAAUGCGAUCCCUUUGGA 3'
+        | o ||||||||||||||||||
+mir  3' CCUAGUUACGCUAGGGAAACCU 5'
+==================================================
+ath-miR400	Chr5:5461423-5462095 (+)
+tar  5' GUAACUUAUAGUAUUCUCAUU 3'
+        || |||||||o||o|||||| 
+mir  3' CACUGAAUAUUAUGAGAGUAU 5'
+==================================================
+ath-miR414	Chr5:23394055-23394790 (-)
+tar  5' UCAUGAUGAUUAUGAUGAUGA 3'
+        | |o|||||| |||| |||||
+mir  3' ACUGCUACUACUACUUCUACU 5'
+==================================================
+ath-miR5658	Chr5:23394055-23394790 (+)
+tar  5' GAUCAUCAUCAUAAUCAUCAU 3'
+          |||||||||| ||||||||
+mir  3' AAAGUAGUAGUAGUAGUAGUA 5'
+==================================================
+ath-miR161.1	Chr1:23489954-23490626 (+)
+tar  5' ACCCUAAUUUAGUCACGUUCA 3'
+        ||||o || ||||||| ||||
+mir  3' UGGGGCUACAUCAGUGAAAGU 5'
+==================================================
+ath-miR161.2	Chr1:23489954-23490626 (+)
+tar  5' UAGUCACGUUCAAUGCAUUGA 3'
+        ||||||| |||||||||||||
+mir  3' AUCAGUGAAAGUUACGUAACU 5'
+==================================================
+ath-miR472-3p	Chr4:8382246-8383191 (-)
+tar  5' GGAAUGGGUGGAGUGGGAAAAA 3'
+        || |||||o|||||o|||||||
+mir  3' CCAUACCCGCCUCAUCCUUUUU 5'
+==================================================
+ath-miR5654-5p	Chr4:8382246-8383191 (-)
+tar  5' CUGAAGAUGCUUGGGAUUUGU 3'
+          ||||||| |||||||||o|
+mir  3' ACCUUCUAC-AACCCUAAAUA 5'
