@@ -1,0 +1,188 @@
+---
+title: "Analysis_ProTerm"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(ggpmisc)
+```
+
+
+```{r}
+### load and preprocess experiment data (barcode count files)
+# input:        character or connection; data file with input read counts
+# dark:         character or connection; data file with output read counts from dark condition
+# light:        optional; character or connection; data file with output read counts from light condition (only available for tobacco leaf system)
+# subassembly:  R object; subassembly data frame
+# rcc:          numeric vector with two or three elements; read count cutoffs to be applied to the input and output;
+#               first element: cutoff for input; second element: cutoff for output 'dark'; third element: cutoff for output 'light' (uses second element if no third element given)
+load_experiment <- function(input, output, subassembly, rcc = c(1, 1, 1)) {
+  # configure read count cutoff
+  if (length(rcc) == 2) {
+    rcc[3] <- rcc[2]
+  } else if (length(rcc) != 3 | ! is.numeric(rcc)) {
+    stop('rcc must contain two to three numeric values')
+  }
+  
+  # load and merge files (only keep barcodes detected in both input and output)
+  data_inp <- read_table2(input, col_names = c('count', 'barcode'))
+  
+  data_both <- read_table2(output, col_names = c('count', 'barcode')) %>%
+    inner_join(data_inp, by = 'barcode', suffix = c('_out', '_inp')) %>%
+    mutate(
+      light = "FALSE"
+    )
+  
+  # merge with subassembly
+  data_both <- inner_join(data_both, subassembly, by = 'barcode')
+  
+  # read count cutoff
+  data_both <- data_both %>%
+    filter(
+      (count_inp >= rcc[1]) & (count_out >= rcc[2])
+    )
+  
+  # aggregate barcodes (sum of individual counts)
+  data_both <- data_both %>%
+    group_by(across(-any_of(c('count_inp', 'count_out', 'barcode')))) %>%
+    summarise(
+      n_bc = n(),
+      count_inp = sum(count_inp),
+      count_out = sum(count_out)
+    ) %>%
+    ungroup()
+  
+  # calculate enrichment
+  data_both <- data_both %>%
+    group_by(light) %>%
+    mutate(
+      enrichment = log2((count_out / sum(count_out)) / (count_inp / sum(count_inp)))
+    ) %>%
+    ungroup()
+  
+  # return result
+  return(data_both)
+}
+```
+
+
+
+```{r}
+### load subassembly
+subassembly <- read_tsv('/subassembly/subassembly_genomic_terminators_filtered.tsv')
+```
+
+
+```{r}
+### load experiment data
+reps <- c('1','2','3')
+```
+
+
+```{r}
+data_all <- expand_grid('rep' = reps) %>%
+  nest_by(across(everything())) %>%
+  summarise(
+    load_experiment(
+      input = paste0('data/barcode_counts/rep', str_sub(rep, 1, 1), '/barcode_pPSt_35Senh-35Spr-GFP-termPro_', as.roman(str_sub(rep, 1, 1)), '_input.count.gz'),
+      output = paste0('data/barcode_counts/rep', str_sub(rep, 1, 1), '/barcode_pPSt_35Senh-35Spr-GFP-termPro_', as.roman(str_sub(rep, 1, 1)), if_else(nchar(rep) > 1, str_sub(rep, 2), ''), '_output.count.gz'),
+      subassembly = subassembly,
+      rcc = c(5, 5, 5)
+    )
+  ) %>%
+  ungroup()
+```
+
+
+```{r}
+data_all <- data_all %>% filter(variant=="WT" & is.na(truncation))
+```
+
+
+```{r}
+### normalize to WT t35S construct (most abundant terminator in library)
+data_all <- data_all %>%
+  group_by(rep) %>%
+  mutate(
+    enrichment = enrichment - enrichment[variant == 'WT' & id == 't35S']
+  ) %>%
+  ungroup()
+```
+
+
+```{r}
+sequences <- read.table("RR_genomic_terminators.fa", sep="\t",header=FALSE)
+colnames(sequences) <- c("id","seq")
+sequences$id <- gsub(">","",sequences$id)
+sequences
+```
+
+```{r}
+data_all_proto <- data_all %>% left_join(sequences,by="id") 
+```
+
+
+Label species 
+```{r}
+data_all_proto <- data_all_proto %>% mutate(Species = case_when(
+  substr(data_all_proto$id,1,4) == "Arab" ~ "Arabidopsis", 
+  substr(data_all_proto$id,1,2) == "Zm" ~ "Maize", 
+  substr(data_all_proto$id,1,2) == "AT" ~ "Arabidopsis",
+  substr(data_all_proto$id,1,2) == "Ma" ~ "Maize",
+  substr(data_all_proto$id,1,1) == "t" ~ "Control",
+  substr(data_all_proto$id,1,2) == "GC" ~ "GC"
+  )) 
+```
+
+
+Label each control 
+```{r}
+data_all_proto <- data_all_proto %>% mutate(Controls = case_when(
+  grepl("_CDS",id) == TRUE ~ "CDS",
+  grepl("_Positional_random_", id) == TRUE ~ "Positional_random",
+  grepl("_ACGT_random_", id) == TRUE ~ "ACGT_random",
+  grepl("-AAAA",id) == TRUE ~ "G4-AAAA",
+  grepl("-AABB",id) == TRUE ~ "G4-AABB",
+  grepl("-ABBB",id) == TRUE ~ "G4-ABBB",
+  grepl("-BBBB",id) == TRUE ~ "G4-BBBB"
+  ))
+```
+
+Clean up the control column 
+```{r}
+data_all_proto <- data_all_proto %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "Arabidopsis"),"Gene",Controls)) %>%
+  mutate(Controls = if_else((is.na(Controls) & Species == "Maize"),"Gene",Controls)) %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "GC"),"GC",Controls)) %>% 
+  mutate(Controls = if_else((is.na(Controls) & Species == "Control"),"Control",Controls)) 
+```
+
+Labeling Primary and secondary PACs
+```{r}
+data_all_proto <- data_all_proto %>% mutate(PAC = case_when(
+  (Controls=="Gene" & (grepl("_2",id) == TRUE)) ~ "Secondary",
+)) %>% 
+  mutate(PAC = if_else((is.na(PAC) & Controls =="Gene"),"Primary",PAC))
+```
+
+
+```{r}
+save(data_all_proto, file = 'RData/data_all_proto.Rdata')
+```
+
+
+
+
+
+
+
+
