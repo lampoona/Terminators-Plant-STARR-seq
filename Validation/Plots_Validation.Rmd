@@ -1,0 +1,943 @@
+---
+title: "Plots_Validation"
+output: html_document
+date: '2023-03-26'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(PNWColors)
+library(ggsignif)
+library(stringr)
+library(readr)
+library(ggrepel)
+library(gprofiler2)
+library(Biostrings)
+library(universalmotif)
+library(ggpubr)
+library(MetBrewer)
+library(PLColors)
+```
+
+```{r}
+### function to display sample size on plot
+give.n <- function(x, y = -Inf, vjust = -1, size = 8/.pt){
+  return(c(y = y, vjust = vjust, size = size, label = length(x)))
+}
+```
+
+```{r}
+load('Tobacco/RData/data_val_tob.Rdata')
+load('Protoplasts/RData/data_val_proto.Rdata')
+```
+
+```{r}
+data_val_proto
+```
+
+
+```{r}
+data_val_proto <- data_val_proto %>% left_join(all_terms %>% select(Species,Controls,id),by="id") %>% mutate(mean_enrichment = (rep1 + rep2)/2) 
+
+```
+
+```{r}
+data_val_tob <- data_val_tob %>% left_join(all_terms %>% select(Species,Controls,id),by="id") %>% mutate(mean_enrichment = (rep1 + rep2)/2) %>% mutate(Type = if_else(Controls=="Control" & Species=="Control" & is.na(Type),"full",Type)) 
+
+```
+
+```{r}
+data_val_tob
+```
+
+
+```{r}
+data_val_tob %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq %>% 
+  select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) 
+```
+
+
+```{r}
+correlation_val_to_lib <- data_val_tob %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+correlation_val_to_lib
+```
+```{r}
+data_val_tob
+```
+
+
+
+```{r}
+data_val_tob %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq %>% 
+  select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) %>%
+  ggplot(aes(x=mean_enrichment.x, y=mean_enrichment.y)) + 
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'gray',
+    linetype = 'dashed'
+  ) +
+  geom_point(alpha=.3) +
+  geom_text(
+    data = correlation_val_to_lib,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(geom="text",label="n = 423",x=-7.2,y=-1, size=5.3) +
+  scale_x_continuous(
+    name = expression(log[2]('strength, validation')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  scale_y_continuous(
+    name = expression(log[2]('strength, library')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = 'right'
+  ) + 
+  coord_fixed()
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2C.pdf")
+```
+
+
+```{r}
+correlation_val_to_lib_p <- data_val_proto %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq_proto %>% select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+correlation_val_to_lib_p
+```
+
+
+
+
+```{r}
+data_val_proto %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq_proto %>% 
+  select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) %>%
+  ggplot(aes(x=mean_enrichment.x, y=mean_enrichment.y)) + 
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'gray',
+    linetype = 'dashed'
+  ) +
+  geom_point(alpha=.3) +
+  geom_text(
+    data = correlation_val_to_lib_p,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(geom="text",label="n = 425",x=-4.,y=-.1, size=5.3) +
+  scale_x_continuous(
+    name = expression(log[2]('strength, validation')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  scale_y_continuous(
+    name = expression(log[2]('strength, library')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = 'right'
+  ) + 
+  coord_fixed()
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2D.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2D.pdf")
+```
+
+```{r}
+correlation_val_to_lib_t <- data_val_tob %>% 
+  filter(Type %in% c('0*start','full','high','low','mid','null')) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment),by='id') %>%
+  mutate(Val_group = if_else(is.na(Val_group),"Control",Val_group)) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(mean_enrichment.x, mean_enrichment.y, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+correlation_val_to_lib_t
+```
+
+
+
+##protoplast validation
+
+```{r}
+data_val_proto #%>% filter(Species == 'Control')
+```
+
+
+```{r}
+correlation_12 <- data_val_proto %>%
+#  group_by(light) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(rep1, rep2, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(rep1, rep2, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+#  group_by(light) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+```
+
+```{r}
+data_val_proto %>% filter(Controls=="Control")
+```
+
+```{r}
+data_val_proto <- data_val_proto %>% mutate(Type = if_else(Controls=="Control" & Species=="Control" & is.na(Type),"full",Type)) 
+```
+
+
+```{r}
+ggplot(data_val_proto, aes(x = rep1, y = rep2)) +
+  geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'gray',
+    linetype = 'dashed'
+  ) +
+  geom_hex(bins=50)+
+  geom_point(
+    data = data_val_proto %>% filter(Species == 'Control') %>% filter(Type=="full"), Labels=id, col="red"
+   ) +
+    geom_label_repel(data = data_val_proto %>% filter(Species == 'Control') %>% filter(Type=="full"),
+             aes(label = id),
+                  box.padding   = 0.3, 
+                  point.padding = 0.3,
+                  size=6,
+                  segment.color = 'red',
+                  xlim = c(0, NA), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                ) +
+  geom_text(
+    data = correlation_12,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(geom="text",label="n = 1,975",x=-4,y=.5, size=5.3) +
+  scale_x_continuous(
+    name = expression(log[2]('terminator strength, rep1')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  scale_y_continuous(
+    name = expression(log[2]('terminator strength, rep2')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+  coord_fixed() 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2B.pdf")
+```
+
+
+```{r}
+correlation_12 <- data_val_tob %>%
+#  group_by(light) %>%
+  summarise(
+    r_square = sprintf('~~R^2 == "%.2f"', cor(rep1, rep2, use = 'complete.obs')^2),
+    spearman = sprintf('~~rho == "%.2f"', cor(rep1, rep2, use = 'complete.obs', method = 'spearman'))
+  ) %>%
+  pivot_longer(
+    c(r_square, spearman),
+    names_to = 'method',
+    values_to = 'label'
+  ) %>%
+#  group_by(light) %>%
+  mutate(
+    vjust = 1.5 * seq_len(n())
+  ) %>%
+  ungroup()
+```
+
+
+
+```{r}
+ggplot(data_val_tob, aes(x = rep1, y = rep2)) +
+geom_abline(
+    slope = 1,
+    intercept = 0,
+    color = 'gray',
+    linetype = 'dashed'
+  ) +
+  geom_hex(bins=50)+
+  geom_point(
+    data = data_val_proto %>% filter(Species == 'Control') %>% filter(Type=="full"), Labels=id, col="red"
+   ) +
+    geom_label_repel(data = data_val_proto %>% filter(Species == 'Control') %>% filter(Type=="full"),
+             aes(label = id),
+                  box.padding   = 0.3, 
+                  point.padding = 0.3,
+                  size=6,
+                  segment.color = 'red',
+                  xlim = c(0, NA), # <--- here
+                   seed = 1,
+                  direction  = "y"
+                ) +
+  geom_text(
+    data = correlation_12,
+    aes(label = label, vjust = vjust),
+    x = -Inf,
+    y = Inf,
+    hjust = 0,
+    size = 15/.pt,
+    parse = TRUE
+  ) +
+  annotate(geom="text",label="n = 1,965",x=-6.7,y=-.8, size=5.3) +
+    scale_x_continuous(
+    name = expression(log[2]('terminator strength, rep1')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  scale_y_continuous(
+    name = expression(log[2]('terminator strength, rep2')),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = c(.7, .1),
+    legend.justification = "center",  
+    legend.box.just = "top",
+    #legend.title.position = "None",
+    legend.margin = margin(3, 3, 3, 3),
+    legend.direction="horizontal",
+    legend.text = element_text(size=10)
+    ) + 
+  scale_fill_viridis_c(
+    trans = 'log2'
+  ) +
+  guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
+  coord_fixed() 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure2A.pdf")
+```
+
+```{r}
+data_val_proto %>% filter(Val_group=="in_silico")
+data_val_proto 
+```
+
+
+
+#in silico protoplasts 
+```{r}
+tmp <- data_val_proto %>% filter(Val_group=="in_silico") %>% separate(Type,c("type1","type2"),sep="\\+") %>% filter(!is.na(type2)) %>%  gather(key = "key", value = "Type", type1, type2) %>% select(-key) #%>% arrange(id)
+tmp2 <- data_val_proto %>% filter(Val_group=="in_silico") %>% separate(Type,c("type1","type2"),sep="\\+") %>% filter(is.na(type2)) %>% mutate(Type=type1) %>% select(!c(type2,type1))
+
+data_val_proto_silico <- rbind(tmp2,tmp) #%>% 
+  #mutate(mean_enrichment = (rep1 + rep2)/2) #%>% 
+  #separate(Type,c("Round","Model"),sep="\\*")
+data_val_proto_silico
+```
+
+
+
+```{r}
+data_val_tob_silico %>%   filter(id=="AT2G13960")
+```
+
+```{r}
+data_val_tob_silico
+```
+
+
+```{r}
+foo <- data_val_proto_silico %>% 
+  group_by(id) %>% 
+  mutate(diff = abs(mean_enrichment - min(mean_enrichment))) %>%
+  ungroup() %>% 
+  arrange(desc(diff)) %>% 
+  filter(id=="AT2G13960") %>%
+  mutate(seq=gsub("T","U",final_seq)) %>% 
+  mutate(name=paste(id,Type,sep=":")) %>%
+  select(name,seq) 
+```
+
+ 
+
+```{r}
+foo %>%
+  separate(seq, paste0("pos", 0:nchar(.$seq)), sep = "", convert = TRUE, fill = "right") %>% 
+  select(-pos0) %>%  
+  pivot_longer(cols = starts_with("pos"), names_to = "pos", values_to = "base") %>% 
+  mutate(pos=gsub('pos','',pos)) %>% 
+  mutate(type=substr(name,11,nchar(name))) %>% 
+  mutate(test=paste0(pos,base)) %>%
+  group_by(pos) %>%
+  mutate(tmp = test[type == "0*start"]) %>%
+  mutate(color = if_else(test!=tmp,"red","gray"))
+```
+ 
+ 
+ 
+ 
+ 
+```{r}
+level_order <- c('0*start', '3*tobacco', '3*maize', '3*both',  '10*tobacco', '10*maize', '10*both')
+foo %>%
+  separate(seq, paste0("pos", 0:nchar(.$seq)), sep = "", convert = TRUE, fill = "right") %>% 
+  select(-pos0) %>%  
+  pivot_longer(cols = starts_with("pos"), names_to = "pos", values_to = "base") %>% 
+  mutate(pos=gsub('pos','',pos)) %>% 
+  mutate(type=substr(name,11,nchar(name))) %>% 
+  mutate(test=paste0(pos,base)) %>%
+  group_by(pos) %>%
+  mutate(tmp = test[type == "0*start"]) %>%
+  mutate(color = if_else(test!=tmp,"red","gray")) %>%
+  filter(as.numeric(pos) <=170, as.numeric(pos) >=113) %>%
+  ggplot(aes(x = as.numeric(pos), y = factor(type,levels=level_order),fill=color)) + 
+        geom_tile(color = "black", size = 0.1) +
+        geom_text(aes(label=base)) +
+       scale_fill_manual(values = c("white", "red")) +
+  theme_classic() +
+  #theme_void()+
+        theme(#panel.border = element_rect(size = 2),
+              plot.title = element_text(size = rel(1.2)),
+              axis.text.y = element_blank(),
+              axis.ticks.y = element_blank(),
+              axis.title = element_blank(),
+              axis.ticks = element_blank(),
+              legend.title = element_blank(),
+              legend.position = "none") +
+  
+    coord_equal()
+ #ggsave('test.png')
+```
+ 
+ 
+```{r}
+#data_val_tob_silico %>%
+data_val_proto_silico %>% 
+   filter(Type %in% c("0*start","10*maize")) %>%
+   group_by(Type) %>%
+   summarise(enrichment_values = median(mean_enrichment, na.rm=TRUE)) #%>%
+```
+
+ 
+ 
+```{r} 
+level_order <- c('0*start', '3*tobacco', '3*maize', '3*both',  '10*tobacco', '10*maize', '10*both')
+data_val_proto_silico %>%
+  ggplot(aes(x=factor(Type, levels=level_order),y=mean_enrichment,fill=factor(Type, levels=level_order))) +
+   #facet_grid(cols = vars(Model)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-4.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  xlab("Prediction used for scoring")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7C.pdf")
+```
+
+
+```{r}
+data_val_proto_silico %>%
+ rowwise() %>% 
+  mutate(UGUA=str_count(final_seq,'TGTA')) %>%
+  mutate(AAUAA= str_count(final_seq,'AATAA')) %>%
+ select(Type,UGUA,AAUAA) %>%
+  group_by(Type) %>%
+  summarize(UGUA=mean(UGUA),AAUAA=mean(AAUAA)) %>%
+ pivot_longer(cols=c('UGUA','AAUAA'),names_to = 'motif',values_to = 'count') %>%
+  separate(Type,c('round','model'),sep="\\*") %>%
+ggplot() +
+  geom_point(aes(x=factor(round, levels=c('0','3','10')),y=count,col=motif,shape=as.factor(model)),size=5) + 
+  theme_classic(base_size = 20) + 
+  scale_color_manual(values=c("darkgreen","orange")) +
+  labs(shape='model') +
+  ylab("avg motif count/sequence") +
+  xlab("Evolution round") +
+  theme(legend.position = 'right',
+        aspect.ratio = 1.8)
+```    
+
+
+
+
+```{r}
+tmp <- data_val_tob %>% filter(Val_group=="in_silico") %>% separate(Type,c("type1","type2"),sep="\\+") %>% filter(!is.na(type2)) %>%  gather(key = "key", value = "Type", type1, type2) %>% select(-key) #%>% arrange(id)
+tmp2 <- data_val_tob %>% filter(Val_group=="in_silico") %>% separate(Type,c("type1","type2"),sep="\\+") %>% filter(is.na(type2)) %>% mutate(Type=type1) %>% select(!c(type2,type1))
+
+data_val_tob_silico <- rbind(tmp2,tmp) #%>% 
+  #mutate(mean_enrichment = (rep1 + rep2)/2) 
+
+data_val_tob_silico
+```
+
+```{r}
+rbind(data_val_proto_silico %>% mutate(assay="Protoplasts"), data_val_tob_silico %>% mutate(assay="Tobacoo")) %>%
+  group_by(id,assay) %>% 
+  filter(n()==7) %>%
+mutate(nullval = mean_enrichment[Type=="0*start"]) %>%
+ mutate(diff_from_null = mean_enrichment - nullval) %>%
+ ungroup() %>%
+ group_by(Type,assay) %>%
+ drop_na(mean_enrichment) %>%
+ summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+ ungroup() %>%
+ group_by(assay) %>%
+ summarize(diff = median_mean_enrichment - median_mean_enrichment[Type == "0*start"],across()) %>%
+mutate(fold = 2^diff)
+```
+
+
+```{r} 
+level_order <- c('0*start', '3*tobacco', '3*maize', '3*both',  '10*tobacco', '10*maize', '10*both')
+data_val_tob_silico %>%
+  mutate(mean_enrichment= .5*(rep1 + rep2)) %>%
+  ggplot(aes(x=factor(Type, levels=level_order),y=mean_enrichment,fill=factor(Type, levels=level_order))) +
+   #facet_grid(cols = vars(Model)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+  ylim(c(-7.5,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  ) +
+  xlab("Prediction used for scoring")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.pdf")
+```
+
+
+```{r}
+data_val_tob %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  filter(!(Type %in% c("null","add_CA","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
+  ggplot(aes(x=factor(Type, levels=level_order),y=diff_from_null,fill=factor(Type,levels=level_order))) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.5,
+    outlier.shape = NA,
+    alpha=.5
+    #fill = 'white'
+  ) +
+  geom_point(
+    alpha = 0.5,
+    col='black'
+    ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab('difference from CA variant') +
+ ylim(c(-1,3)) +
+  theme(
+    axis.text.x = element_blank(),
+   #axis.text.x = element_text(
+  #angle = 45,
+  # hjust = 1,
+  # axis.text.x = element_blank()
+  # ),
+    legend.position = 'none',
+    aspect.ratio = .8
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  )
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.png") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.pdf") 
+```
+
+
+
+```{r}
+level_order = c("add_AAUAAA", "add_UGUA" , "add_GUGUG","CA_AAUAAA","CA_UGUA","CA_GUGUG" , "CA_UGUA_GUGUG", "CA_AAUAAA_UGUA" ,"CA_AAUAAA_GUGUG" ,"CA_AAUAAA_UGUA_GUGUG")
+data_val_proto %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  filter(!(Type %in% c("null","add_CA","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
+  ggplot(aes(x=factor(Type,levels=level_order),y=diff_from_null,fill=factor(Type,levels=level_order))) +
+   #facet_grid(cols = vars(Model)) +
+  #geom_violin(
+  #  alpha = 0.5
+  #  ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.5,
+    outlier.shape = NA,
+    alpha=.5
+    #fill = 'white'
+  ) +
+  geom_point(
+    alpha = 0.5,
+    col='black'
+    ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression('difference')) +
+  theme(
+    axis.text.x = element_blank(),
+   # axis.text.x = element_text(
+     ## angle = 45,
+      #hjust = 1,
+     # axis.text.x = element_blank()
+    #),
+    legend.position = 'none',
+    aspect.ratio = .8
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  )
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4G.png") 
+```
+
+
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+ group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+ ungroup() %>%
+ group_by(Type,assay) %>%
+ drop_na(mean_enrichment) %>%
+ summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+ ungroup() %>%
+ group_by(assay) %>%
+ summarize(diff = median_mean_enrichment - median_mean_enrichment[Type == "add_CA"],across()) %>%
+mutate(fold = 2^diff)
+#  summarize(mean = sum(diff)/11,across())
+```
+
+
+
+
+```{r}
+level_order = c("UGUA","UGCA","UCUA","CGUA")
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="UGUA_perm") %>%
+  filter(id != "Zm00001d041790_T001") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="UGUA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  ggplot(aes(x=factor(Type,levels=level_order),y=diff_from_null,fill=factor(Type))) +
+   facet_grid(cols = vars(assay)) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.4,
+    outlier.shape = NA,
+    alpha=.5
+    #fill = 'white'
+  ) +
+  geom_point(
+    alpha = 0.5,
+    col='black'
+    ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("Difference from UGUA") +
+ # ylim(c(-4,0)) +
+  theme(
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+    ),
+    legend.position = 'none',
+    aspect.ratio = 2
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",4)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  )
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.pdf")
+```
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="UGUA_perm") %>%
+  filter(id != "Zm00001d041790_T001") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="UGUA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  group_by(Type,assay) %>%
+  drop_na(mean_enrichment) %>%
+  summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+  ungroup() %>%
+  group_by(assay) %>%
+  summarize(diff = median_mean_enrichment - median_mean_enrichment[Type == "UGUA"])
+```
+
+
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="AAUAAA_perm") %>%
+  filter(id != "Zm00001d021574_T002") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="AATAAA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  ggplot(aes(x=factor(Type),y=diff_from_null,fill=factor(Type))) +
+   facet_grid(cols = vars(assay)) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.4,
+    outlier.shape = NA,
+    alpha=.5
+    #fill = 'white'
+  ) +
+  geom_point(
+    alpha = 0.5,
+    col='black'
+    ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("Difference from AATAAA") +
+  ylim(c(-2,.5)) +
+  theme(
+    #axis.text.x = element_blank(),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+    ),
+    legend.position = 'none',
+    aspect.ratio = 2
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",4)) +   
+  geom_hline(
+    yintercept = 0,
+    col = "blue",
+    linetype = 2
+  )
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.pdf")
+```
+
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="AAUAAA_perm") %>%
+  filter(id != "Zm00001d021574_T002") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="AATAAA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  group_by(Type,assay) %>%
+  drop_na(mean_enrichment) %>%
+  summarise(median_mean_enrichment = median(mean_enrichment)) %>%
+  ungroup() %>%
+  group_by(assay) %>%
+  summarize(diff = median_mean_enrichment - median_mean_enrichment[Type == "AATAAA"])
+  #summarise(quotient = (2^(median_mean_enrichment[Type == 1] - median_mean_enrichment[TF == 0])))
+```
+
+
+```{r}
+evolution  %>%
+  filter(round %in% c(0,3,10)) %>%
+  mutate(Type=paste(round,opt_for,sep="*")) %>% 
+  mutate(id1=paste(origin,Type,sep=":")) %>% 
+  left_join(data_val_tob %>% filter(Val_group=="in_silico") %>% mutate(Real_tobacco = mean_enrichment) %>% mutate(id1=paste(id,Type,sep=":")) %>% select(id1,Real_tobacco), by=c('id1')) %>%
+  left_join(data_val_proto %>% filter(Val_group=="in_silico") %>% mutate(Real_proto = mean_enrichment) %>% mutate(id1=paste(id,Type,sep=":")) %>% select(id1,Real_proto), by=c('id1')) %>%
+   drop_na() %>%
+  mutate(round=factor(round)) %>%
+ # ggscatter(x = "Real_tobacco", y = "prediction_tobacco",
+  ggscatter(x="Real_proto",y="prediction_maize",
+   color = "round", # Points color, shape and size
+   alpha=.5,
+   palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+   add = "reg.line",  # Add regressin line
+   add.params = list(color = "blue", fill = "lightgray"), # Customize reg. line
+   conf.int = TRUE, # Add confidence interval
+   cor.coef = TRUE, # Add correlation coefficient. see ?stat_cor
+   cor.coeff.args = list(method = "pearson", label.x = -4, label.sep = "\n")
+   ) + 
+   labs(x = expression(log[2]('enrichment, measured')),
+        y = expression(log[2]('enrichment, prediction'))) + 
+  coord_fixed()
+```
+
+
+

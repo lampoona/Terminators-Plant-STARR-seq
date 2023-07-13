@@ -1,0 +1,597 @@
+---
+title: "Validation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+validation schema for 2000 oligo pool.
+- 3 shortened bacterial sequences
+- (240 total) from the ACGT random oligos, picked out 20 sequences that had neither CA, AAUAAA, UGUA, or GUGUG and then added back motifs
+  - null 
+  - null + CA
+  - null + UGUA 
+  - null + AAUAAA
+  - null + GUGUGUUGU
+  - null + CA + AAUAAA
+  - null + CA + UGUA
+  - null + CA + GUGUGUUGU
+  - null + CA + AAUAAA + UGUA
+  - null + CA + AAUAAA + GUGUGUUGU
+  - null + CA + UGUA + GUGUGUUGU
+  - null + CA + AAUAAA + UGUA + GUGUGUUGU
+- (80 total) picked 20 sequences that had one strong AAUAAA site.
+  - ACTCAA,ACTCAA,ACTAAA permutations 
+- (80 total) picked 20 sequences that had one strong UGUA site 
+  - UGCA,CGUA,UCUA permutations 
+- (total 1554) picked 222 sequences (111 from each species) sequences for in-silico evolution 
+  - rounds (0,3,10) in either maize,tobacco, or both 
+- after removing duplicates (total is 1813), I have 187 sequences left
+  - normalize each dataset enrichment 0 to 1 and then take the average of both. 
+  - 62 top scorers
+  - 62 mid scorers
+  - 63 low scorers
+  
+```{r}
+library(tidyverse)
+library(dplyr)
+library(PNWColors)
+library(ggsignif)
+library(stringr)
+library(readr)
+library(ggrepel)
+library(gprofiler2)
+library(Biostrings)
+library(universalmotif)
+library(ggpubr)
+library(MetBrewer)
+library(PLColors)
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+load('/ProtoplastSTARRseq/RData/all_terms.Rdata')
+```
+
+
+```{r}
+all_terms_RNA <- all_terms %>% mutate(seq2=gsub("T","U",seq))
+all.seqs.RNA <- Biostrings::RNAStringSet(deframe(select(all_terms_RNA, id, seq2)))
+all.seqs.RNA
+```
+
+```{r}
+proto_meme <- read_meme('../ProtoplastSTARRseq/data/protoplast_RNA.meme')
+summarise_motifs(proto_meme)$name
+```
+
+
+#validation sequences
+```{r}
+ACGT_rand_RNA <- all_terms %>% mutate(seq2=gsub("T","U",seq)) %>% filter(Controls=="ACGT_random") 
+ACGT_rand.seqs.RNA <- Biostrings::RNAStringSet(deframe(select(ACGT_rand_RNA, id, seq2)))
+ACGT_rand.seqs.RNA
+```
+
+
+picking out sequences that dont really have UGUA 
+```{r}
+thresh <- 0.77
+UGUA_not.pos <- as_tibble(scan_sequences(filter_motifs(proto_meme, name = "8-UGUA"), ACGT_rand.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  filter(score <= thresh) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+UGUA_not.pos
+no_UGUA <- UGUA_not.pos %>% select(sequence,score,start) %>% mutate(no_UGUA=TRUE)
+no_UGUA 
+```
+
+
+picking out sequenes that dont have AAUAAA
+```{r}
+thresh <- 0.81
+AAUAAA_not.pos <- as_tibble(scan_sequences(filter_motifs(proto_meme, name = "9-AAUAAA"), ACGT_rand.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  filter(score <= thresh) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+#AAUAAA_not.pos
+no_AAUAAA <- AAUAAA_not.pos %>% select(sequence,score,start) %>% mutate(no_AAUAAA=TRUE)
+no_AAUAAA 
+```
+
+
+picking out sequences that are not G/U rich after the cleavage site 
+```{r}
+ACGT_rand_RNA_end <- all_terms %>% mutate(seq2=gsub("T","U",seq)) %>% filter(Controls=="ACGT_random") %>% mutate(seq2=str_sub(seq2,151,170))
+ACGT_rand.seqs.RNA_end <- Biostrings::RNAStringSet(deframe(select(ACGT_rand_RNA, id, seq2)))
+```
+
+
+```{r}
+thresh <- 0.77
+GUGUG_not.pos <- as_tibble(scan_sequences(filter_motifs(proto_meme, name = "3-GUGUGUUGU"), ACGT_rand.seqs.RNA_end, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  group_by(sequence) %>%
+  filter(score == max(score)) %>%
+  filter(score <= thresh) %>%
+  mutate(
+    pos = 0.5 * (start + stop)
+  ) %>%
+  ungroup()
+GUGUG_not.pos
+no_GUGUG <- GUGUG_not.pos %>% select(sequence,score,start) %>% mutate(no_GUGUG=TRUE)
+no_GUGUG
+```
+
+
+combining all that have neither of the 3 motifs 
+```{r}
+null_motifs <- no_UGUA %>% 
+  inner_join(no_AAUAAA,by="sequence") %>%
+  inner_join(no_GUGUG,by="sequence") %>%
+  mutate(average_score=(score.y+score.x+ score)/3) %>%
+  left_join(all_terms %>% mutate(sequence=id) %>% select(sequence,Species,seq),by="sequence") %>%
+  distinct(sequence,Species,seq,average_score) %>% 
+  arrange(average_score) %>%
+  mutate(has_CA = if_else(substr(seq,150,151)=="CA",TRUE,FALSE)) %>% 
+  filter(has_CA == FALSE) %>% 
+  head(n=20) %>%
+  select(-has_CA)
+null_motifs
+```
+
+all combinations
+null (regular)
+
+each additions: 
+null + CA
+null + UGUA 
+null + AAUAAA
+null + GUGUGUUGU
+
+single additions with cleavage
+null + CA + AAUAAA
+null + CA + UGUA
+null + CA + GUGUGUUGU
+
+double additions with cleavage
+null + CA + AAUAAA + UGUA
+null + CA + AAUAAA + GUGUGUUGU
+null + CA + UGUA + GUGUGUUGU
+
+triple addition with cleavage
+null + CA + AAUAAA + UGUA + GUGUGUUGU
+
+#make dataframe with all singles 
+```{r}
+null_motifs_single <- null_motifs %>% 
+  mutate(null=seq) %>%
+  mutate(add_CA = `str_sub<-`(seq, 150, 151, value = 'CA')) %>%
+  mutate(add_UGUA = `str_sub<-`(seq, 108, 111, value = 'TGTA')) %>%
+  mutate(add_AAUAAA = `str_sub<-`(seq, 127, 132, value = 'AATAAA')) %>%
+  mutate(add_GUGUG = `str_sub<-`(seq, 159, 167, value = 'GTGTGTTGT')) 
+null_motifs_single
+```
+
+
+```{r}
+null_motifs_all <- null_motifs_single %>% 
+  #single additions with cleavage
+  mutate(CA_AAUAAA = `str_sub<-`(add_CA, 127, 132, value = 'AATAAA')) %>%
+  mutate(CA_UGUA= `str_sub<-`(add_CA, 108, 111, value = 'TGTA')) %>%
+  mutate(CA_GUGUG= `str_sub<-`(add_CA, 159, 167, value = 'GTGTGTTGT')) %>%
+  #double additions with cleavage
+  mutate(CA_AAUAAA_UGUA = `str_sub<-`(CA_AAUAAA, 108, 111, value = 'TGTA')) %>%
+  mutate(CA_AAUAAA_GUGUG = `str_sub<-`(CA_AAUAAA, 159, 167, value = 'GTGTGTTGT')) %>%
+  mutate(CA_UGUA_GUGUG = `str_sub<-`(CA_UGUA, 159, 167, value = 'GTGTGTTGT')) %>%
+  #triple addition with cleavage
+  mutate(CA_AAUAAA_UGUA_GUGUG = `str_sub<-`(CA_AAUAAA_UGUA, 159, 167, value = 'GTGTGTTGT')) %>%
+  select(-seq)
+
+```
+
+```{r}
+null_motifs_final <- null_motifs_all %>% 
+  pivot_longer(!c(sequence,average_score,Species),names_to="Type",values_to="final_seq") %>%
+  select(sequence,Type,final_seq) %>%
+  mutate(id=paste(sequence,Type,sep="|")) %>%
+  select(id,final_seq) %>%
+  mutate(Val_group = "null_plus_motifs")
+null_motifs_final #%>% mutate(length=nchar(final_seq)) %>% ungroup() %>% count(length)
+```
+
+#count duplicates
+```{r}
+null_motifs_all %>% 
+  pivot_longer(!c(sequence,average_score,Species),names_to="Type",values_to="final_seq") %>%
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  ungroup() #%>% 
+  #distinct(final_seq, .keep_all=TRUE)
+```
+
+
+#finding sequences that have a single strong AAUAAA site. Only pick the top 20. 
+```{r}
+thresh <- 0.4
+high_DAAUAAAR.pos <- as_tibble(scan_sequences(filter_motifs(proto_meme, name = "9-AAUAAA"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  arrange(desc(score)) %>%
+  slice_max(score,n=2) %>%
+  mutate(diff=max(score)-min(score)) %>%
+  ungroup() %>% 
+  select(motif,sequence,diff,score,match,start,stop) %>%
+  arrange(desc(diff)) %>%
+  filter(match=="AAUAAA" & diff > .35 & start > 100) %>% 
+  head(n=20)
+#high_DAAUAAAR.pos
+```
+#the permutations to add
+ACTCAA,ACTCAA,ACTAAA
+
+```{r}
+final_AAUAAA_perms <- high_DAAUAAAR.pos %>% select(sequence,start,stop) %>% 
+  mutate(id=sequence) %>% 
+  left_join(all_terms %>% select(id,seq),by="id") %>% 
+  select(id,start,stop,seq) %>%
+  mutate(AATAAA=seq) %>%
+  mutate(ACTAAA=`str_sub<-`(seq, start, stop, value = 'ACTAAA')) %>%
+  mutate(AATCAA=`str_sub<-`(seq, start, stop, value = 'AATCAA')) %>%
+  mutate(ACTCAA=`str_sub<-`(seq, start, stop, value = 'ACTCAA')) %>%
+  select(-seq,-start,-stop) %>%
+  pivot_longer(!id,names_to="type",values_to="final_seq") %>% 
+  mutate(id=paste(id,type,sep="|")) %>%
+  select(id,final_seq) %>%
+  mutate(Val_group = "AAUAAA_perm")
+final_AAUAAA_perms
+```
+
+
+#same for UGUA 
+```{r}
+thresh <- 0.4
+high_UGUA.pos <- as_tibble(scan_sequences(filter_motifs(proto_meme, name = "8-UGUA"), all.seqs.RNA, RC = FALSE, threshold = 1, nthreads = 0)) %>% mutate(
+    score = (score - min.score) / (max.score - min.score)
+  ) %>%
+  filter(score >= thresh) %>%
+  group_by(sequence) %>%
+  arrange(desc(score)) %>%
+  slice_max(score,n=2) %>%
+  mutate(diff=max(score)-min(score)) %>%
+  ungroup() %>% 
+  select(motif,sequence,diff,score,match,start,stop) %>%
+  arrange(desc(diff)) %>%
+  filter(match=="UGUA" & diff > .24 & start > 90) %>% 
+  head(n=20)
+#high_UGUA.pos
+```
+
+UGCA,CGUA,UCUA
+```{r}
+final_UGUA_perms <- high_UGUA.pos %>% select(sequence,start,stop) %>% 
+  mutate(id=sequence) %>% 
+  left_join(all_terms %>% select(id,seq),by="id") %>% 
+  select(id,start,stop,seq) %>%
+  mutate(UGUA=seq) %>%
+  mutate(UCUA=`str_sub<-`(seq, start, stop, value = 'TCTA')) %>%
+  mutate(CGUA=`str_sub<-`(seq, start, stop, value = 'CGTA')) %>%
+  mutate(UGCA=`str_sub<-`(seq, start, stop, value = 'TGCA')) %>%
+  select(-seq,-start,-stop) %>%
+  pivot_longer(!id,names_to="type",values_to="final_seq") %>% 
+  mutate(id=paste(id,type,sep="|")) %>%
+  select(id,final_seq) %>% 
+  mutate(Val_group = "UGUA_perm")
+final_UGUA_perms
+```
+
+
+```{r}
+Control_terms <- all_terms %>% 
+  filter(Species=="Control") %>% 
+  filter(Controls=="Control") %>% 
+  filter(id!="tMAS") %>%
+  select(id,seq) %>%
+  mutate(length=nchar(seq)) %>% 
+  mutate( final_seq = case_when(
+    id=="t35S" ~ substr(seq,24,193),
+    id=="tAg7" ~ substr(seq,1,170),
+    id=="tNOS" ~ substr(seq,1,170)
+  )) %>% 
+  mutate(test = nchar(final_seq)) %>%
+  mutate(id=paste(id,"short",sep="|")) %>%
+  select(id,final_seq) %>% 
+  mutate(Val_group="bact_short")
+Control_terms
+```
+
+
+```{r}
+evolution <- read.table("TobaccoSTARRseq/MachineLearning/evolution_data.tsv",header=TRUE)
+```
+
+
+
+evolution clean out duplicate sequences
+```{r}
+to_remove <- evolution %>%
+  filter(round %in% c(0,3,10)) %>%
+  group_by(sequence) %>%
+  filter(n()>1) %>%
+  ungroup()
+to_remove
+```
+
+
+```{r}
+temp_evolution <- evolution %>% 
+  filter(round %in% c(0,3,10)) %>%
+  anti_join(to_remove) %>%
+  mutate(tag=paste(round,opt_for,sep="*"))  %>%
+  mutate(new_id=paste(origin,tag,sep="|")) %>%
+  select(id=new_id,final_seq=sequence)
+temp_evolution 
+```
+
+
+```{r}
+to_add_back <- evolution %>% 
+  filter(round %in% c(0,3,10)) %>%
+  group_by(sequence) %>%
+  filter(n()>1) %>%
+  ungroup() %>%
+  mutate(tag=paste(round,opt_for,sep="*")) %>%
+  group_by(sequence) %>%
+  mutate(tmp=paste(tag, collapse="+")) %>% 
+  mutate(new_id=paste(origin,tmp,sep="|")) %>%
+  ungroup() %>%
+  distinct(new_id,.keep_all=T) %>%
+  select(id=new_id,final_seq=sequence)
+to_add_back
+```
+
+
+```{r}
+evolution_fin <- rbind(temp_evolution,to_add_back)
+evolution_fin
+evolution_fin %>% distinct(final_seq, .keep_all=T) 
+```
+
+check for duplicate sequences
+```{r}
+evolution_fin %>% 
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+
+#combine them all
+```{r}
+validation_set <- rbind(Control_terms,null_motifs_final,final_AAUAAA_perms,final_UGUA_perms,evolution_final)
+validation_set 
+```
+
+```{r}
+remove <- validation_set %>%
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  ungroup()
+remove
+```
+
+
+```{r}
+add <- validation_set %>%
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  mutate(new_id=paste(id,collapse="~")) %>%
+  mutate(Val=paste(Val_group,collapse = "~")) %>%
+  ungroup() %>%
+  select(id=new_id,final_seq,Val_group=Val) %>%
+  distinct(final_seq, .keep_all = T)
+add
+```
+
+
+
+```{r}
+val_temp <- validation_set %>%
+  anti_join(remove) 
+
+validation_final <- rbind(add,val_temp)
+validation_final
+```
+
+```{r}
+validation_final %>%
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+
+
+```{r}
+names_in_final <- validation_final %>%
+  separate(id,c("id","type"),"\\|") %>% distinct(id) %>% pull(id)
+#names_in_final
+```
+
+
+```{r}
+load("TobaccoSTARRseq/RData/data_seq.Rdata")
+load("ProtoplastsSTARRseq/RData/data_seq_proto.Rdata")
+```
+
+
+```{r}
+#library("scales")
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+data_seq_proto$normal_p <- range01(data_seq_proto$mean_enrichment) 
+data_seq_proto %>% ungroup() %>% arrange(desc(normal_p)) %>% select(id,mean_enrichment,normal_p) 
+```
+
+```{r}
+data_seq$normal_t <- range01(data_seq$mean_enrichment)
+data_seq %>% ungroup() %>% arrange(desc(normal_t)) %>% select(id,mean_enrichment,normal_t) 
+``` 
+
+```{r}
+data_seq_proto %>% ungroup() %>% select(id,mean_enrichment,normal_p,Controls) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment,normal_t),by="id") %>% 
+  mutate(average=(normal_t + normal_p)*.5) %>%
+  arrange(desc(average)) %>%
+  ggplot() + 
+  geom_histogram(aes(x=normal_t),fill="blue",alpha=.5,bins = 100) +
+  geom_histogram(aes(x=normal_p),fill="orange",alpha=.3,bins = 100) + 
+  geom_histogram(aes(x=average),fill="green",alpha=.3,bins = 100)
+```
+
+```{r}
+testing <- data_seq_proto %>% select(id,mean_enrichment,normal_p,Controls) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment,normal_t),by="id") %>% 
+  mutate(average=(normal_t + normal_p)*.5) %>%
+  filter(!is.na(average)) 
+
+mean(testing$average)
+sd(testing$average)
+median(testing$average)
+```
+
+```{r}
+top_scorers <- data_seq_proto %>% ungroup() %>% select(id,mean_enrichment,normal_p,Controls,seq) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment,normal_t),by="id") %>% 
+  mutate(average=(normal_t + normal_p)*.5) %>%
+  filter(!is.na(average)) %>%
+  filter(Controls!="Control") %>%
+  arrange(desc(average)) %>%
+  filter(!id %in% names_in_final) %>%
+  mutate(Val_group="high") %>%
+  head(62) %>% select(id,final_seq=seq,Val_group)
+top_scorers
+#top_seqs <- top_scorers %>% select(id) %>% pull(id)
+```
+
+
+#need to add 30 strong, 30 weak, 30 intermediate of each species 
+
+```{r}
+midrange_scorers <- data_seq_proto %>% ungroup() %>% select(id,mean_enrichment,normal_p,Controls,seq) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment,normal_t),by="id") %>% 
+  mutate(average=(normal_t + normal_p)*.5) %>%
+  filter(!is.na(average)) %>%
+  filter(Controls!="Control") %>%
+  arrange(desc(average)) %>%
+  filter(!id %in% names_in_final) %>%
+  filter(average > 0.4137389 & average < 0.42) %>%
+  mutate(Val_group="mid") %>%
+  head(n=62) %>% 
+  select(id,final_seq=seq,Val_group)
+midrange_scorers
+```
+
+```{r}
+low_scorers <- data_seq_proto %>% 
+  ungroup() %>% 
+  select(id,mean_enrichment,normal_p,Controls,seq) %>% 
+  left_join(data_seq %>% select(id,mean_enrichment,normal_t),by="id") %>% 
+  mutate(average=(normal_t + normal_p)*.5) %>%
+  filter(!is.na(average)) %>%
+  filter(Controls!="Control") %>%
+  arrange(desc(average)) %>%
+  filter(!id %in% names_in_final) %>%
+  mutate(Val_group="low") %>%
+  tail(n=63) %>% 
+ select(id,final_seq=seq,Val_group)
+low_scorers
+```
+
+
+```{r}
+range_seq <- rbind(top_scorers,midrange_scorers,low_scorers) %>% mutate(id=paste(id,Val_group,sep="|"))
+range_seq
+```
+
+
+
+```{r}
+validation_final_final <- rbind(validation_final,range_seq)
+validation_final_final %>%
+  group_by(final_seq) %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+```{r}
+validation_final_final %>%
+  mutate(length=nchar(final_seq)) %>% filter(length==170)
+```
+
+```{r}
+save(validation_final_final, file = 'RData/Validation.Rdata')
+```
+
+
+```{r}
+validation_final_final
+```
+
+
+```{r}
+validation_final_final %>% 
+  mutate(new_seq = paste0("TAAG",final_seq,"AGGT"))
+```
+
+
+check for RE sites, found none. 
+```{r}
+RE_sites <- c("GGTCTC", "CGTCTC", "GAGACC","GAGACG")
+validation_final_final %>% 
+  mutate(new_seq = paste0("TAAG",final_seq,"AGGT")) %>%
+  mutate(RE_site = grepl(paste(RE_sites, collapse="|"), new_seq)) %>%
+  count(RE_site)
+```
+
+add adapters and fix id 
+```{r}
+validation_final_fin <- validation_final_final %>% 
+  mutate(new_seq = paste0("TAAG",final_seq,"AGGT")) %>%
+  mutate(final=paste0("GCGCCGTCTCC",new_seq,"CGAGACGGTGC")) %>% 
+  select(id,final) %>%
+  mutate(id = gsub("^",">",id)) 
+validation_final_fin %>% write_tsv("Validation_tmp.fa", col_names =FALSE)
+
+```
+
+awk -v OFS='\n' '{$1=$1;print}' Validation_tmp.fa > Validation_oligo_pool.fa
+
+
+
+```{r}
+validation_final_fin %>% mutate(length=nchar(final)) %>% count(length)
+```
+
+
+

@@ -1,0 +1,193 @@
+---
+title: "Analysis_Val_tobacco"
+output: html_document
+date: '2023-03-26'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggplot2)
+library(ggpmisc)
+```
+
+```{r}
+### load and preprocess experiment data (barcode count files)
+# input:        character or connection; data file with input read counts
+# dark:         character or connection; data file with output read counts from dark condition
+# light:        optional; character or connection; data file with output read counts from light condition (only available for tobacco leaf system)
+# subassembly:  R object; subassembly data frame
+# rcc:          numeric vector with two or three elements; read count cutoffs to be applied to the input and output;
+#               first element: cutoff for input; second element: cutoff for output 'dark'; third element: cutoff for output 'light' (uses second element if no third element given)
+load_experiment <- function(input, output, subassembly, rcc = c(1, 1, 1)) {
+  # configure read count cutoff
+  if (length(rcc) == 2) {
+    rcc[3] <- rcc[2]
+  } else if (length(rcc) != 3 | ! is.numeric(rcc)) {
+    stop('rcc must contain two to three numeric values')
+  }
+  
+  # load and merge files (only keep barcodes detected in both input and output)
+  data_inp <- read_table2(input, col_names = c('count', 'barcode'))
+  
+  data_both <- read_table2(output, col_names = c('count', 'barcode')) %>%
+    inner_join(data_inp, by = 'barcode', suffix = c('_out', '_inp')) %>%
+    mutate(
+      light = "FALSE"
+    )
+  
+  # merge with subassembly
+  data_both <- inner_join(data_both, subassembly, by = 'barcode')
+  
+  # read count cutoff
+  data_both <- data_both %>%
+    filter(
+      (count_inp >= rcc[1]) & (count_out >= rcc[2])
+    )
+  
+  # aggregate barcodes (sum of individual counts)
+  data_both <- data_both %>%
+    group_by(across(-any_of(c('count_inp', 'count_out', 'barcode')))) %>%
+    summarise(
+      n_bc = n(),
+      count_inp = sum(count_inp),
+      count_out = sum(count_out)
+    ) %>%
+    ungroup()
+  
+  # calculate enrichment
+  data_both <- data_both %>%
+    group_by(light) %>%
+    mutate(
+      enrichment = log2((count_out / sum(count_out)) / (count_inp / sum(count_inp)))
+    ) %>%
+    ungroup()
+  
+  # return result
+  return(data_both)
+}
+```
+
+```{r}
+### load subassembly
+subassembly <- read_tsv('../subassembly/subassembly_validation_terminators_plus_Controls.tsv')
+```
+
+```{r}
+nbc_val <-subassembly %>% filter(variant=="WT") %>%
+  group_by(id) %>%
+  count() %>%
+  ungroup()
+```
+
+```{r}
+### load experiment data
+reps <- c('1','2')
+```
+
+
+
+```{r}
+data_all <- expand_grid('rep' = reps) %>%
+  nest_by(across(everything())) %>%
+  summarise(
+    load_experiment(
+      input = paste0('data/barcode_counts/rep', str_sub(rep, 1, 1), '/barcode_pPSt_35Senh-35Spr-GFP-valtermTob_', as.roman(str_sub(rep, 1, 1)), '_input.count.gz'),
+      output = paste0('data/barcode_counts/rep', str_sub(rep, 1, 1), '/barcode_pPSt_35Senh-35Spr-GFP-valtermTob_', as.roman(str_sub(rep, 1, 1)), if_else(nchar(rep) > 1, str_sub(rep, 2), ''), '_output.count.gz'),
+      subassembly = subassembly,
+      rcc = c(5, 5, 5)
+    )
+  ) %>%
+  ungroup() %>% filter(variant=="WT" & is.na(truncation)) %>% select(-light,truncation,)
+```
+
+```{r}
+data_all %>% filter(id=="t35S")
+```
+
+```{r}
+### normalize to WT t35S construct (most abundant terminator in library)
+data_all <- data_all %>%
+  group_by(rep) %>%
+  mutate(
+    enrichment = enrichment - enrichment[variant == 'WT' & id == 't35S']
+  ) %>%
+  ungroup()
+```
+
+
+```{r}
+load("../RData/Validation.Rdata")
+validation_final_final
+```
+
+```{r}
+data_val_tob <- data_all %>% left_join(validation_final_final, by="id")
+```
+
+```{r}
+tmp <- data_val_tob %>% separate(id, c("id1", "id2"), sep = "~") %>% filter(!is.na(id2)) %>%  gather(key = "key", value = "id", id1, id2) %>% select(-key) %>% mutate(Val_group = if_else(grepl("start",id),"in_silico","AAUAAA_perm"))
+tmp2 <- data_val_tob %>% separate(id, c("id", "id2"), sep = "~") %>% filter(is.na(id2)) %>% select(!id2)
+```
+
+```{r}
+data_val_tob <- rbind(tmp,tmp2) %>% 
+  select(rep,id,GC,length,enrichment,final_seq,Val_group) %>%
+  pivot_wider(
+    names_from = rep,
+    names_prefix = 'rep',
+    values_from = enrichment
+  ) %>%
+  separate(id,c("id","Type"),sep = "\\|")
+data_val_tob
+save(data_val_tob, file = 'RData/data_val_tob.Rdata')
+```
+
+
+
+##exporting final table for paper 
+```{r}
+tmp <- validation_final_final %>% separate(id, c("id1", "id2"), sep = "~") %>% filter(!is.na(id2)) %>%  gather(key = "key", value = "id", id1, id2) %>% select(-key) %>% mutate(Val_group = if_else(grepl("start",id),"in_silico","AAUAAA_perm"))
+tmp2 <- validation_final_final %>% separate(id, c("id", "id2"), sep = "~") %>% filter(is.na(id2)) %>% select(!id2)
+```
+
+```{r}
+Val_temp <- rbind(tmp,tmp2) %>% 
+  left_join(data_val_tob %>% mutate(id = paste(id,Type,sep="|")) %>% 
+  mutate(Tobacco_strength = .5*(rep1 + rep2)) %>% select(id,Tobacco_strength),by='id') %>%
+  left_join(data_val_proto %>% mutate(id = paste(id,Type,sep="|")) %>% rename(Protoplast_strength=mean_enrichment) %>% select(id,Protoplast_strength)) %>%
+  left_join(nbc_val %>% rename(n_bc=n),by='id') %>% 
+  mutate(n_bc = if_else(id %in% c("Zm00001d019534_T002|AATAAA","Zm00001d019534_T002|0*start"),11,n_bc)) %>%
+  separate(id,c("id","Type"),sep = "\\|") %>%
+  mutate(length=nchar(final_seq)) %>%
+   mutate(GC = str_count(final_seq, "[GC]")/length) %>%
+select(id,GC,length,Type,Val_group,n_bc,Tobacco_strength,Protoplast_strength, final_seq) 
+```
+
+```{r}
+controls_to_add <- data_val_proto %>% filter(Controls=="Control") %>% filter(is.na(Type)) %>%
+  select(id,Type,Val_group,mean_enrichment, length, GC) %>%
+  rename(Protoplast_strength=mean_enrichment) %>% 
+  mutate(Type="long") %>%
+  mutate(Val_group="bact_long") %>%
+  left_join(data_val_tob %>% filter(is.na(Type)) %>% mutate(Tobacco_strength = .5*(rep1 + rep2)) %>%
+  select(id,Tobacco_strength),by='id') %>%
+  left_join(nbc_val %>% rename(n_bc=n),by='id') %>%
+  left_join(all_terms %>% select(id,seq) %>% rename(final_seq=seq), by='id') %>%
+  select(id,GC,length,Type,Val_group,n_bc,Tobacco_strength,Protoplast_strength, final_seq)
+```
+
+```{r}
+rbind(controls_to_add,Val_temp) %>% arrange(id) %>%
+  write_csv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/SupplementaryTable3.csv")
+```
+
+
+
+

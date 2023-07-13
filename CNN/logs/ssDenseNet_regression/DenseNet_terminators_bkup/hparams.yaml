@@ -1,0 +1,43 @@
+aggr: None
+conv_kwargs:
+  activation: relu
+  batchnorm: false
+  channels:
+  - 4
+  - 128
+  conv_kernels:
+  - 5
+  dropout_rates: 0.0
+  omit_final_pool: true
+  padding: same
+  pool_kernels:
+  - 2
+dn_kwargs:
+  R:
+  - 2
+  - 4
+  - 4
+  - 4
+  growth_rates: 12
+  layers:
+  - 6
+  - 12
+  - 24
+  - 16
+fc_kwargs:
+  batchnorm: false
+  dropout_rate: 0.0
+  hidden_dims: []
+hp_metric: null
+input_len: 170
+loss_fxn: mse
+lr: 0.001
+optimizer: adam
+optimizer_kwargs:
+  weight_decay: 0.0001
+output_dim: 2
+scheduler: reduce_lr_on_plateau
+scheduler_patience: 2
+seed: null
+strand: ss
+task: regression
