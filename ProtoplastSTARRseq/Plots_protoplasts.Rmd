@@ -669,7 +669,7 @@ data_seq_proto %>%
     breaks = seq(-10, 10, 2),
     limits = c(-4.5,.5)
   )+
-  #ylim(c(-6.7,1.5)) +
+  ylim(c(-4.5,1.5)) +
   theme(
     axis.text.x = element_text(
       angle = 45,
@@ -679,14 +679,30 @@ data_seq_proto %>%
     aspect.ratio = .5
   ) +
   xlab("GC content (%)") +
-  scale_fill_manual(values = pnw_palette("Bay",10,type="continuous"))    
+  scale_fill_manual(values = pnw_palette("Bay",10,type="continuous"))  +
+  geom_signif(comparisons = list(c("14-29", "29-32"), c("29-32", "32-34"), c("32-34", "34-35"), 
+                                            c("34-35", "35-37"), c("35-37", "37-39"), c("37-39", "39-40"), 
+                                            c("39-40", "40-43"), c("40-43", "43-46"), c("43-46", "46-71")),
+                       map_signif_level = FALSE,
+                       textsize = 2,
+                       vjust = -0.5)
   # geom_hline(
   #   yintercept = 0,
   #   col = "blue",
   #   linetype = 2
   #  )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3C.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3C.pdf")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3C.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3C.pdf")
+```
+```{r}
+data_seq_proto %>% 
+  ungroup() %>%
+  mutate(GC_bin=cut_number(GC,n=10,
+                           labels=c("14-29", "29-32", "32-34", "34-35", "35-37", "37-39", "39-40", "40-43", "43-46", "46-71")
+                           )) %>% 
+  group_by(GC_bin) %>%
+  summarise(median=median(mean_enrichment)) %>%
+  ungroup()
 ```
 
 
@@ -1117,6 +1133,7 @@ all_terms <- all_terms %>%
 ```{r}
 all_terms <- all_terms %>% filter(id !="tOCS")
 save(all_terms, file = 'RData/all_terms.Rdata')
+load('RData/all_terms.Rdata')
 ```
 
 
@@ -1930,15 +1947,32 @@ rbind(DAAUAAAR.pos,UGUAWYDDDDWNW.pos,GUGUGUUGU.pos)%>% mutate(mootif= case_when(
     legend.position = 'none',
     aspect.ratio = .7
   ) +
-  scale_fill_manual(values = pnw_palette("Bay",8)) 
+  scale_fill_manual(values = pnw_palette("Bay",8)) +
+  stat_compare_means(label = "p.signif", method = "wilcox",
+                     ref.group = "None",size=5)  
+ # geom_signif(comparisons = list(c("None","A+B+C")), y_position = .5,
+#              vjust = .1,map_signif_level = TRUE)
 #+   
   # geom_hline(
   #   yintercept = 0,
   #   col = "blue",
   #   linetype = 2
   # )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4E.png") 
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4E.png") 
 ```
+
+```{r}
+rbind(DAAUAAAR.pos,UGUAWYDDDDWNW.pos,GUGUGUUGU.pos)%>% mutate(mootif= case_when(
+  motif == "2-DAAUAAAR" ~ "A",
+  motif == "1-UGUAWYDDDDWNW" ~ "B",
+  motif == "3-GUGUGUUGU" ~ "C"
+)) %>% group_by(sequence) %>% mutate(combo = paste0(unique(mootif),collapse="+")) %>% ungroup() %>% select(sequence,combo) %>% full_join(data_seq_proto %>% mutate(sequence=id) %>% select(sequence,mean_enrichment,Species),by="sequence") %>% filter(!is.na(mean_enrichment)) %>% unique() %>% mutate(combo=if_else(is.na(combo),"None",combo)) %>%
+  group_by(combo) %>%
+  summarize(median=median(mean_enrichment)) %>%
+  ungroup()
+```
+
+
 
 ```{r}
 level_order = c("None","A","B","C","A+B","A+C","B+C","A+B+C")
@@ -2222,7 +2256,9 @@ empty <- data_seq_proto %>%
 
 ```{r}
 finalblah <- merge(blahblah,empty,all=TRUE)
-finalblah
+finalblah %>% 
+  group_by(type) %>%
+  summarize(median=median(mean_enrichment,na.rm=TRUE))
 ```
 
 ```{r}
@@ -2245,9 +2281,11 @@ finalblah %>%
   xlab("AATAAA variations") + 
   ylim(c(-4.5,1)) + 
   ylab(expression(log[2]('terminator strength'))) + 
-  scale_fill_manual(values=pnw_palette("Bay",20))
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7B.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7B.pdf")
+  scale_fill_manual(values=pnw_palette("Bay",20))  + 
+   stat_compare_means(label = "p.signif", method = "wilcox",
+                     ref.group = "None",size=4) 
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7B.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7B.pdf")
 ```
 
 

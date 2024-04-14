@@ -500,7 +500,7 @@ foo %>%
 ```{r}
 #data_val_tob_silico %>%
 data_val_proto_silico %>% 
-   filter(Type %in% c("0*start","10*maize")) %>%
+  # filter(Type %in% c("0*start","10*maize")) %>%
    group_by(Type) %>%
    summarise(enrichment_values = median(mean_enrichment, na.rm=TRUE)) #%>%
 ```
@@ -572,7 +572,24 @@ ggplot() +
         aspect.ratio = 1.8)
 ```    
 
-
+number of UGUA in silico 
+```{r}
+data_val_proto_silico %>%
+ rowwise() %>% 
+  mutate(UGUA=str_count(final_seq,'TGTA')) %>%
+  group_by(Type) %>%
+  summarize(UGUA=mean(UGUA)) %>%
+  separate(Type,c('round','model'),sep="\\*") %>%
+  ggplot() +
+  geom_jitter(aes(x=factor(round, levels=c('0','3','10')),y=UGUA,col=model,shape=model),size=5,alpha=.75) +
+  theme_classic(base_size = 20) +
+  scale_color_manual(values=c("orange","darkgreen","gray",'darkblue')) +
+  labs(shape='model') +
+  ylab("avg UGUA count/sequence") +
+  xlab("Evolution round") +
+  theme(legend.position = 'right',
+        aspect.ratio = 1.8)
+```
 
 
 ```{r}
@@ -626,7 +643,7 @@ data_val_tob_silico %>%
     position = position_dodge(0.9),
   ) +
   ylab(expression(log[2]('terminator strength'))) +
-  ylim(c(-7.5,1)) +
+  ylim(c(-7.5,1.0)) +
   theme(
     axis.text.x = element_text(
       angle = 45,
@@ -641,10 +658,23 @@ data_val_tob_silico %>%
     col = "blue",
     linetype = 2
   ) +
-  xlab("Prediction used for scoring")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.pdf")
+  xlab("Prediction used for scoring") +
+  stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "0*start",size=2)  
+  
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7B.pdf")
 ```
+
+```{r}
+data_val_tob_silico %>%
+  mutate(mean_enrichment= .5*(rep1 + rep2)) %>% 
+  group_by(Type) %>%
+  summarize(median=median(mean_enrichment,na.rm=TRUE)) %>%
+  ungroup()
+  
+```
+
 
 
 ```{r}
@@ -655,7 +685,32 @@ data_val_tob %>%
   mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
   mutate(diff_from_null = mean_enrichment - nullval) %>%
   ungroup() %>%
-  filter(!(Type %in% c("null","add_CA","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
+  filter(!(Type %in% c("null","add_CA","add_AAUAAA","add_UGUA","add_GUGUG")))
+```
+
+```{r}
+data_val_tob %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>% 
+  filter(Type=="add_CA") %>% select(diff_from_null)
+```
+
+
+
+```{r}
+level_order = c("add_CA","add_AAUAAA", "add_UGUA" , "add_GUGUG","CA_AAUAAA","CA_UGUA","CA_GUGUG" , "CA_UGUA_GUGUG", "CA_AAUAAA_UGUA" ,"CA_AAUAAA_GUGUG" ,"CA_AAUAAA_UGUA_GUGUG")
+data_val_tob %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  filter(!(Type %in% c("null","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
   ggplot(aes(x=factor(Type, levels=level_order),y=diff_from_null,fill=factor(Type,levels=level_order))) +
   theme_classic(
     base_size = 18
@@ -688,20 +743,35 @@ data_val_tob %>%
     legend.position = 'none',
     aspect.ratio = .8
   ) +
-  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  scale_fill_manual(values = pnw_palette("Bay",8)) +   
   geom_hline(
     yintercept = 0,
     col = "blue",
     linetype = 2
-  )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.png") 
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.pdf") 
+  ) +  
+  stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "add_CA",size=2)  
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.png") 
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4F.pdf") 
+```
+
+```{r}
+data_val_tob %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  filter(!(Type %in% c("null","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
+  group_by(Type) %>% 
+  summarize(median=median(diff_from_null)) %>%
+  ungroup()
 ```
 
 
-
 ```{r}
-level_order = c("add_AAUAAA", "add_UGUA" , "add_GUGUG","CA_AAUAAA","CA_UGUA","CA_GUGUG" , "CA_UGUA_GUGUG", "CA_AAUAAA_UGUA" ,"CA_AAUAAA_GUGUG" ,"CA_AAUAAA_UGUA_GUGUG")
+level_order = c("add_CA","add_AAUAAA", "add_UGUA" , "add_GUGUG","CA_AAUAAA","CA_UGUA","CA_GUGUG" , "CA_UGUA_GUGUG", "CA_AAUAAA_UGUA" ,"CA_AAUAAA_GUGUG" ,"CA_AAUAAA_UGUA_GUGUG")
 data_val_proto %>% 
   ungroup() %>%
   filter(Val_group=='null_plus_motifs') %>% 
@@ -709,7 +779,7 @@ data_val_proto %>%
   mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
   mutate(diff_from_null = mean_enrichment - nullval) %>%
   ungroup() %>%
-  filter(!(Type %in% c("null","add_CA","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
+  filter(!(Type %in% c("null","add_AAUAAA","add_UGUA","add_GUGUG"))) %>% 
   ggplot(aes(x=factor(Type,levels=level_order),y=diff_from_null,fill=factor(Type,levels=level_order))) +
    #facet_grid(cols = vars(Model)) +
   #geom_violin(
@@ -734,7 +804,7 @@ data_val_proto %>%
     size = 14/.pt,
     position = position_dodge(0.9),
   ) +
-  ylab(expression('difference')) +
+  ylab(expression('difference from CA variant')) +
   theme(
     axis.text.x = element_blank(),
    # axis.text.x = element_text(
@@ -745,15 +815,30 @@ data_val_proto %>%
     legend.position = 'none',
     aspect.ratio = .8
   ) +
-  scale_fill_manual(values = pnw_palette("Bay",7)) +   
+  scale_fill_manual(values = pnw_palette("Bay",8)) +   
   geom_hline(
     yintercept = 0,
     col = "blue",
     linetype = 2
-  )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4G.png") 
+  ) +  
+  stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "add_CA",size=3)
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4G.png") 
 ```
 
+```{r}
+data_val_proto %>% 
+  ungroup() %>%
+  filter(Val_group=='null_plus_motifs') %>% 
+  group_by(id) %>%
+  mutate(nullval = mean_enrichment[Type=="add_CA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  filter(!(Type %in% c("null","add_AAUAAA","add_UGUA","add_GUGUG"))) %>%
+  group_by(Type) %>% 
+  summarize(median=median(diff_from_null)) %>%
+  ungroup()
+```
 
 
 ```{r}
@@ -807,7 +892,7 @@ rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay=
     position = position_dodge(0.9),
   ) +
   ylab("Difference from UGUA") +
- # ylim(c(-4,0)) +
+  ylim(c(-1,1)) +
   theme(
     #axis.text.x = element_blank(),
     axis.text.x = element_text(
@@ -822,10 +907,27 @@ rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay=
     yintercept = 0,
     col = "blue",
     linetype = 2
-  )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.pdf")
+  ) + 
+  stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "UGUA",size=1.5)
+  
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7D.pdf")
 ```
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="UGUA_perm") %>%
+  filter(id != "Zm00001d041790_T001") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="UGUA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  group_by(assay,Type) %>% 
+  summarize(median=median(diff_from_null,na.rm=TRUE))
+```
+
+
 
 ```{r}
 rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
@@ -890,10 +992,25 @@ rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay=
     yintercept = 0,
     col = "blue",
     linetype = 2
-  )
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.pdf")
+  ) +
+stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "AATAAA",size=1.5)
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7C.pdf")
 ```
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>%
+  filter(Val_group=="AAUAAA_perm") %>%
+  filter(id != "Zm00001d021574_T002") %>% 
+  group_by(id,assay) %>% 
+  mutate(nullval = mean_enrichment[Type=="AATAAA"]) %>%
+  mutate(diff_from_null = mean_enrichment - nullval) %>%
+  ungroup() %>%
+  group_by(Type,assay) %>%
+  summarize(median=median(diff_from_null,na.rm=TRUE))
+```
+
 
 
 ```{r}
@@ -911,6 +1028,11 @@ rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay=
   group_by(assay) %>%
   summarize(diff = median_mean_enrichment - median_mean_enrichment[Type == "AATAAA"])
   #summarise(quotient = (2^(median_mean_enrichment[Type == 1] - median_mean_enrichment[TF == 0])))
+```
+
+
+```{r}
+evolution <- read.table("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq//TobaccoSTARRseq/MachineLearning/data/evolution_data.tsv",header=TRUE)
 ```
 
 
@@ -938,6 +1060,316 @@ evolution  %>%
         y = expression(log[2]('enrichment, prediction'))) + 
   coord_fixed()
 ```
+
+
+```{r}
+rbind(data_val_tob %>% mutate(assay="Tobacco"), data_val_proto %>% mutate(assay="Protoplasts")) %>% filter(Val_group == "in_silico") 
+```
+
+
+
+```{r}
+nano_luc <- read_csv("~/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq/Validation/Nano_luciferase_validation.csv") %>%  mutate_all(~gsub("t35S_T", "t35S", .)) %>% mutate_at(vars(3:6), as.numeric)
+nano_luc
+```
+
+```{r}
+desired_order <- c("0", "3", "10")
+nano_luc %>% mutate(ratio_NL = log2(nano_norm/luc_norm)) %>% 
+  group_by(experiment) %>%
+  mutate(norm_35S = ratio_NL - mean(ratio_NL[Name=='t35S'])) %>%
+  ungroup() %>% 
+  filter(Name!="Blank") %>%
+  filter(Name!='t35S') %>%
+  mutate(origin = str_sub(Name,0,9)) %>%
+  mutate(round = as.factor(str_sub(Name,12,-1L))) %>%
+  mutate(round = factor(round, levels = desired_order)) %>%
+  ggplot(aes(x=round,y=norm_35S ,col=ID)) + 
+  facet_grid(cols = vars(origin)) +
+  geom_hline(yintercept = 0,linetype='dashed', col='blue') +
+ stat_summary(fun.data=data_summary, color="darkgray") +
+  geom_jitter(position=position_jitter(0.2),size=3,alpha=.8) +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  xlab("Round of evolution") + 
+  theme_classic(base_size = 18) +
+  theme(#axis.text.x = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position="none", aspect.ratio = 1.8)  +
+  scale_color_manual(values=c(rep("blue",3),rep("orange",3)))  #+ 
+ # scale_x_discrete(labels = c("0", "3", "10"))
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7d.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7d.pdf")
+```
+
+
+```{r}
+nano_luc %>% mutate(ratio_NL = log2(nano_norm/luc_norm)) %>% 
+  group_by(experiment) %>%
+  mutate(norm_35S = ratio_NL - mean(ratio_NL[Name=='t35S'])) %>%
+  ungroup() %>% 
+  filter(Name!="Blank") %>%
+  filter(Name!='t35S') %>%
+  mutate(origin = str_sub(Name,0,9)) %>% 
+  mutate(round = as.numeric(str_sub(Name,12,-1L)))
+```
+
+```{r}
+evoNano <- nano_luc %>% mutate(ratio_NL = log2(nano_norm/luc_norm)) %>% 
+  group_by(experiment) %>%
+  mutate(ratio_NL_35S = ratio_NL - mean(ratio_NL[Name=='t35S'])) %>%
+  ungroup() %>% 
+  filter(Name!="Blank") %>%
+  rename("Name" = "id","luc_norm"="N_luc","nano_norm"="N_nano") %>%
+   select(id,N_luc,N_nano,rep,experiment,ratio_NL,ratio_NL_35S) %>% 
+  mutate(assay="tobacco_evolution") 
+```
+
+
+```{r}
+nano_luc <- read_csv("~/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq/Validation/Nano_luciferase_validation.csv") %>%  mutate_all(~gsub("t35S_T", "t35S", .)) %>% mutate_at(vars(3:6), as.numeric)
+nano_luc
+```
+
+
+```{r}
+other_val <- read_tsv("~/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq/Validation/LucNano_validation.txt") %>% na.omit()
+other_val 
+```
+
+```{r}
+data_summary <- function(x) {
+   m <- mean(x)
+   ymin <- m-sd(x)
+   ymax <- m+sd(x)
+   return(c(y=m,ymin=ymin,ymax=ymax))
+}
+```
+
+
+```{r}
+desired_order <- c("AT3G22360_CDS", "AT5G07380_CDS", "Zm00001d025717_T001_CDS","Zm00001d012972_T002","AT1G26300","AT3G23110","HSP17.4")
+other_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_nano/N_luc)) %>% 
+  group_by(experiment) %>%
+  mutate(value = mean(ratio_NL[name=='35S'])) %>%
+  ungroup() %>% 
+  mutate(ratio_NL = ratio_NL-value) %>% 
+ filter(name != '35S') %>%
+  mutate(name = factor(name, levels = desired_order)) %>%
+  ggplot(aes(x=name,y=ratio_NL ,col=id)) + 
+  geom_hline(yintercept = 0,linetype='dashed', col='blue') +
+  geom_jitter(position=position_jitter(0.2),size=3) +
+  stat_summary(fun.data=data_summary, color="darkgray",geom="line") +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  theme_classic(base_size=18) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position="none", aspect.ratio = .8)  +
+  scale_color_manual(values=pnw_palette("Bay",8)) +
+  scale_x_discrete(labels = c(italic("At")~"CDS 1", italic("At")~"CDS 2", italic("Zm")~"CDS", italic("Zm")~"mid", italic("At")~"mid 1", italic("At")~"mid 2", "HSP17.4"))
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7d.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure7d.pdf")
+```
+
+
+```{r}
+#desired_order <- c("AT1G26300","AT3G23110","Zm00001d012972_T002","AT3G22360_CDS", #"AT5G07380_CDS", "Zm00001d025717_T001_CDS","HSP17.4","35S")
+desired_order <- c("AT3G22360_CDS", "AT5G07380_CDS", "Zm00001d025717_T001_CDS","Zm00001d012972_T002","AT1G26300","AT3G23110","HSP17.4")
+other_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_nano/N_luc)) %>% 
+  group_by(experiment) %>%
+  mutate(value = mean(ratio_NL[name=='35S'])) %>%
+  ungroup() %>% 
+  mutate(ratio_NL = ratio_NL-value) %>% 
+  filter(name != '35S') %>%
+  mutate(name = factor(name, levels = desired_order)) %>%
+  ggplot(aes(x=name,y=ratio_NL ,col=id)) + 
+   geom_hline(yintercept = 0,linetype='dashed', col='blue') +
+ #stat_summary(fun.data="mean_sdl", col="darkgray", geom="pointrange", width=0.5) +
+  stat_summary(fun.data=data_summary, color="darkgray") +
+  geom_jitter(position=position_jitter(0.2),size=3) +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  theme_classic(base_size=18) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position="none", aspect.ratio = .8)  +
+  scale_color_manual(values=pnw_palette("Bay",8)) +
+scale_x_discrete(labels = c(italic("At")~"CDS 1", italic("At")~"CDS 2", italic("Zm")~"CDS", italic("Zm")~"mid", italic("At")~"mid 1", italic("At")~"mid 2", "HSP17.4"))
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure3A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure3A.pdf")
+```
+
+```{r}
+tob_nano <- other_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_nano/N_luc)) %>% 
+  group_by(experiment) %>%
+  mutate(value = mean(ratio_NL[name=='35S'])) %>%
+  ungroup() %>% 
+  mutate(ratio_NL_35S = ratio_NL-value) %>%
+  mutate(id=gsub("35S","t35S",name)) %>% 
+  select(id,N_luc,N_nano,rep,experiment,ratio_NL,ratio_NL_35S) %>% 
+  mutate(assay="tobacco") 
+```
+
+
+```{r}
+proto_val <- read_tsv("~/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq/Validation/Protoplast_validation.txt") %>% na.omit()
+proto_val
+```
+
+```{r}
+proto_nano <- proto_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_Nano/N_Luc)) %>% 
+  mutate(value = mean(ratio_NL[name=='t35S'])) %>%
+  mutate(ratio_NL_35S = ratio_NL - value) %>%
+  ungroup() %>% 
+  mutate(experiment=1) %>%
+  mutate(id=name) %>%
+  rename("N_Luc"="N_luc","N_Nano"="N_nano") %>% 
+  select(id,N_luc,N_nano,rep,experiment,ratio_NL,ratio_NL_35S) %>%
+  mutate(assay="protoplasts") 
+```
+
+
+```{r}
+colnames(tob_nano)
+#colnames(proto_nano)
+#colnames(evoNano)
+rbind(tob_nano,proto_nano,evoNano) %>% 
+write_csv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/SupplementaryTable7.csv", col_names =TRUE)
+```
+
+
+```{r}
+desired_order <- c("Zm00001d025717_T001_CDS","Zm00001d012972_T002","Zm00001d047961_T001","HSP17.4")
+proto_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_Nano/N_Luc)) %>% 
+  mutate(value = mean(ratio_NL[name=='t35S'])) %>%
+  mutate(ratio_NL = ratio_NL - value) %>%
+  ungroup() %>%
+  filter(name != 't35S') %>%
+  mutate(name = factor(name, levels = desired_order)) %>%
+  ggplot(aes(x=name,y=ratio_NL ,color=name)) + 
+ geom_hline(yintercept = 0,linetype='dashed', col='blue') +
+stat_summary(fun.data=data_summary, color="darkgray") +
+  geom_jitter(position=position_jitter(0.2),size=3) +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  theme_classic(base_size=18) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position="none",
+        aspect.ratio = 1.2)  +
+  scale_color_manual(values=pnw_palette("Bay",5)) +
+ scale_x_discrete(labels = c(italic("Zm")~"CDS", italic("Zm")~"mid", italic("Zm")~"high", "HSP17.4", "t35S"))
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure3C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure3C.pdf")
+```
+
+```{r}
+proto_val %>% 
+  filter(name!="Blank") %>%
+  mutate(ratio_NL = log2(N_Nano/N_Luc)) %>% 
+  mutate(value = mean(ratio_NL[name=='t35S'])) %>%
+  mutate(ratio_NL = ratio_NL - value) %>%
+  ungroup() %>% 
+ mutate(id=gsub("t35S_P","t35S",name)) %>% 
+   mutate(id=gsub("HSP17.4","AT3G46230",id)) %>%
+   left_join(data_seq_proto %>% ungroup() %>% select(id,mean_enrichment,Controls),by='id') %>% ggplot(aes(y=ratio_NL,x=mean_enrichment)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x, col = "blue") +
+  theme_classic(base_size=18) +
+  theme(aspect.ratio = 1) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  xlab(expression(log[2]('Terminator strength'))) 
+```
+
+
+
+
+```{r}
+Cleavage %>% filter(id %in% c("AT3G22360_CDS", "AT5G07380_CDS", "Zm00001d025717_T001_CDS","Zm00001d012972_T002","AT1G26300","AT3G23110","AT3G46230","t35S"))
+```
+
+
+```{r}
+library(ggpmisc)
+other_val %>% mutate(id=gsub("35S","t35S",name)) %>% 
+   mutate(id=gsub("HSP17.4","AT3G46230",id)) %>%
+  left_join(data_seq %>% select(id,mean_enrichment,Controls),by='id') %>%
+  filter(id !="Blank") %>% 
+  mutate(ratio_NL = log2(N_nano/N_luc)) %>% 
+  group_by(experiment) %>%
+  mutate(value = mean(ratio_NL[name=='35S'])) %>%
+  ungroup() %>% 
+  mutate(ratio_NL = ratio_NL-value) %>%
+  ggplot(aes(y=ratio_NL,x=mean_enrichment)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x, col = "blue") +
+  theme_classic(base_size=18) +
+  theme(aspect.ratio = 1) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  xlab(expression(log[2]('Terminator strength'))) 
+  
+```
+
+```{r}
+data_val_tob  %>% filter(id=='t35S')
+```
+```{r}
+ nano_luc %>% mutate(ratio_NL = log2(nano_norm/luc_norm)) %>% 
+  group_by(experiment) %>%
+  mutate(norm_35S = ratio_NL - mean(ratio_NL[Name=='t35S'])) %>%
+  ungroup() %>% 
+  mutate(id=Name) %>% 
+  select(id,norm_35S) %>%
+  left_join(
+      data_val_tob %>%
+      mutate(mean_enrichment= .5*(rep1 + rep2)) %>% 
+      filter( id %in% c("AT1G79150","AT5G64270",'t35S')) %>% 
+        filter(Type %in% c("0*start","3*tobacco","10*tobacco","3*tobacco+3*both","full")) %>%
+        mutate(id=case_when(
+          Type=="0*start" ~ paste0(id,"_r0"),
+          Type=="3*tobacco" ~ paste0(id,"_r3"),
+          Type=="3*tobacco+3*both" ~ paste0(id,"_r3"),
+          Type=="10*tobacco" ~ paste0(id,"_r10"),
+          id=="t35S" ~ "t35S"
+          )) %>% 
+  select(id,mean_enrichment), by='id'
+  ) %>% filter(id !="Blank") %>%
+  ggplot(aes(y=norm_35S,x=mean_enrichment)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x, col = "blue") +
+  theme_classic(base_size=18) +
+  theme(aspect.ratio = 1) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  ylab(expression(log[2]('Nano/Luc'))) +
+  xlab(expression(log[2]('Terminator strength'))) 
+```
+
+
+
+
+```{r}
+data_val_tob %>%
+  mutate(mean_enrichment= .5*(rep1 + rep2)) %>% filter( id %in% c("AT1G79150","AT5G64270",'t35S')) %>% filter(Type %in% c("0*start","3*tobacco","10*tobacco","3*tobacco+3*both","full")) %>%
+  mutate(id=case_when(
+    Type=="0*start" ~ paste0(id,"_r0"),
+    Type=="3*tobacco" ~ paste0(id,"_r3"),
+    Type=="3*tobacco+3*both" ~ paste0(id,"_r3"),
+    Type=="10*tobacco" ~ paste0(id,"_r10"),
+    id=="t35S" ~ "t35S"
+  )) %>% 
+  select(id,mean_enrichment)
+```
+
+
 
 
 

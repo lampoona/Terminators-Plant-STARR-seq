@@ -162,7 +162,7 @@ ggplot(data_seq, aes(x = rep1, y = rep2)) +
   ) +
   geom_label_repel(data = data_seq %>% filter(Species == 'Control'),
                   aes(label = id),
-                  box.padding   = 0.3, 
+                  box.padding   = 0.3,
                   point.padding = 0.3,
                   size=6,
                   segment.color = 'red',
@@ -201,8 +201,8 @@ ggplot(data_seq, aes(x = rep1, y = rep2)) +
   ) +
   guides(color = guide_colorbar(title.position="top", title.hjust = 0.5)) +
   coord_fixed() 
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.pdf")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure1B.pdf") 
 ```
 
 
@@ -465,15 +465,33 @@ data_seq %>%
     aspect.ratio = .5
   ) +
   xlab("GC content (%)") +
-  scale_fill_manual(values = pnw_palette("Bay",10,type="continuous")) #+   
+  scale_fill_manual(values = pnw_palette("Bay",10,type="continuous")) +
+  geom_signif(comparisons = list(c("14-29", "29-32"), c("29-32", "32-34"), c("32-34", "34-35"), 
+                                            c("34-35", "35-37"), c("35-37", "37-39"), c("37-39", "39-40"), 
+                                            c("39-40", "40-43"), c("40-43", "43-46"), c("43-46", "46-71")),
+                       map_signif_level = FALSE,
+                       textsize = 2,
+                       vjust = -0.5)
   # geom_hline(
   #   yintercept = 0,
   #   col = "blue",
   #   linetype = 2
   #  ) 
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.png")
-ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.pdf")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3B.pdf")
 ```
+
+```{r}
+data_seq %>% 
+  mutate(GC_bin=cut_number(GC,n=10,
+                           labels=c("14-29", "29-32", "32-34", "34-35", "35-37", "37-39", "39-40", "40-43", "43-46", "46-71")
+            )) %>% 
+  group_by(GC_bin) %>%
+  summarise(median=median(mean_enrichment)) %>%
+  ungroup()
+  
+```
+
 
 ```{r}
 PNW7 <- pnw_palette("Bay",7,type="continuous")
@@ -536,7 +554,11 @@ data_seq %>%
 
 ```{r}
 PNW2 <- pnw_palette("Bay",2)
-data_seq %>% filter(!is.na(PAC)) %>%
+data_seq_proto %>% filter(!is.na(PAC)) %>%
+   mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
   ggplot(aes(x=PAC,y=mean_enrichment,fill=PAC)) +
   facet_grid(cols = vars(Species)) +
   geom_violin(
@@ -597,6 +619,34 @@ data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
   summarize(difference = mean_enrichment[PAC=="Primary"] - mean_enrichment[PAC=="Secondary"]) 
 ```
 
+```{r}
+data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
+  mutate(id2 = gsub("_2","",id)) %>% 
+  group_by(id2,Species) %>% 
+  filter(n()==2) %>% 
+  summarize(difference = mean_enrichment[PAC=="Secondary"] - mean_enrichment[PAC=="Primary"]) %>%
+  ungroup() %>%
+  group_by(Species) %>%
+  summarize(median=median(difference,na.rm=TRUE))
+```
+```{r}
+data_seq_proto %>% ungroup() %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
+  mutate(id2 = gsub("_2","",id)) %>% 
+  group_by(id2,Species) %>% 
+  filter(n()==2) %>% 
+  summarize(difference = mean_enrichment[PAC=="Secondary"] - mean_enrichment[PAC=="Primary"]) %>%
+  ungroup() %>%
+  group_by(Species) %>%
+  summarize(median=median(difference,na.rm=TRUE))
+```
+
+
 
 ```{r}
 PNW2 <- pnw_palette("Bay",3)
@@ -654,17 +704,37 @@ ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_fil
 
 
 ```{r}
-data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+#data_seq_proto 
+data_seq %>%
+ ungroup() %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
   PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
   PAC=="Secondary" ~ "Keep"
   )) %>% filter(keep=="Keep") %>%
-  filter(Species=="Arabidopsis") %>%
-  group_by(PAC) %>%
-    summarise(median=median(mean_enrichment)) %>%
-   ungroup()
-#   summarise(enrichment_values = list(mean_enrichment)) %>%
-#  pull(enrichment_values) %>%
-# {wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+  filter(Species=="Maize") %>% 
+  #filter(Species=="Arabidopsis") %>% 
+  select(id,PAC,mean_enrichment) %>%
+  mutate(id = gsub("_2","",id)) %>% 
+  pivot_wider(names_from=PAC,values_from=mean_enrichment) %>%
+  summarise(wilcox_test_result = wilcox.test(Primary, Secondary)$p.value)
+
+  
+  #group_by(PAC) %>%
+  #  summarise(median=median(mean_enrichment)) %>%
+  # ungroup()
+  # summarise(enrichment_values = list(mean_enrichment)) #%>%
+ # pull(enrichment_values) %>%
+ #{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+```{r}
+data_seq %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>% 
+  mutate(id2 = gsub("_2","",id)) %>% 
+  group_by(id2,Species) %>% 
+  filter(n()==2) %>% 
+  summarize(difference = mean_enrichment[PAC=="Secondary"] - mean_enrichment[PAC=="Primary"]) %>%
+  ungroup()
 ```
 
 
@@ -1004,7 +1074,7 @@ all.seqs.RNA
 #analysing streme MEME motif hits in our data 
 
 ```{r}
-tobacco_meme <- read_meme('/data/misc/tobacco_RNA.meme')
+tobacco_meme <- read_meme('/Users/sgorji/Documents/Terminators/terminator_git/terminators/Github/PlantTerminatorsSTARRseq/TobaccoSTARRseq/data/misc/tobacco_RNA.meme')
 summarise_motifs(tobacco_meme)$name
 ```
 
@@ -1022,7 +1092,7 @@ UGUA.pos <- as_tibble(scan_sequences(filter_motifs(tobacco_meme, name = "1-WUGUA
     pos = 0.5 * (start + stop)
   ) %>%
   ungroup()
-UGUA.pos
+UGUA.pos 
 ```
 
 ```{r}
@@ -1439,9 +1509,22 @@ rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
     legend.position = 'none',
     aspect.ratio = .7
   ) +
-  scale_fill_manual(values = pnw_palette("Bay",8)) 
+  scale_fill_manual(values = pnw_palette("Bay",8)) + 
+  geom_signif(comparisons = list(c("None","A+B+C")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE)
 ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure4D.png") 
 ``` 
+```{r}
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
+  motif == "2-AAUAAAAAWAWWWWU" ~ "A",
+  motif == "1-WUGUAAUDWWWWWWW" ~ "B",
+  motif == "4-UUGUUUBUWUUUUU" ~ "C"
+)) %>% group_by(sequence) %>% mutate(combo = paste0(unique(mootif),collapse="+")) %>% ungroup() %>% select(sequence,combo) %>% full_join(data_seq %>% mutate(sequence=id) %>% select(sequence,mean_enrichment,Species),by="sequence") %>% filter(!is.na(mean_enrichment)) %>% unique() %>% mutate(combo=if_else(is.na(combo),"None",combo)) %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>% 
+  group_by(combo) %>% 
+  summarize(median=median(mean_enrichment)) %>%
+  ungroup()
+```
   
 
 
@@ -1587,6 +1670,10 @@ colnames(arab_CDS) <- c("chromosome","start","stop","id","score","strand")
 arab_CDS 
 ```
 
+```{r}
+polyEff 
+```
+
 
 ```{r}
 all_terms %>% 
@@ -1601,5 +1688,614 @@ all_terms %>%
 )) %>% 
   mutate(PAC = if_else((is.na(PAC) & Controls =="Gene"),"Primary",PAC)) %>% write_csv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/SupplementaryTable2.csv")
 ```
+
+
+```{r}
+AATAAA <- "AATAAA"
+string <- "AATAAA"
+#nchar(string)
+values = c('AATAAA')
+for (i in 1:nchar(string)){
+  if(substring(string,i,i) == "A") {
+    for (j in c("C","G","T")){ 
+    substr(string,i,i) = j
+    values = c(values,string)
+    string <- AATAAA
+    }
+  }
+  if(substring(string,i,i) == "T") {
+    for (j in c("A","C","G")){ 
+    substr(string,i,i) = j
+    values = c(values,string)
+    string <- AATAAA
+    }
+  }
+}
+AATAAA_mutations <- values %>% unique() 
+AATAAA_mutations %>% length()
+```
+
+
+```{r}
+AATAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATAAA=list(gregexpr('AATAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATAAA")))/2)])) %>%
+  unnest(AATAAA) %>% 
+  filter(AATAAA != -1)  %>% count(id) %>% mutate(AATAAA=n) %>% select(-n)
+
+CATAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(CATAAA=list(gregexpr('CATAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "CATAAA")))/2)])) %>%
+  unnest(CATAAA) %>% 
+  filter(CATAAA != -1)  %>%  count(id) %>% mutate(CATAAA=n) %>% select(-n)
+
+GATAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(GATAAA=list(gregexpr('GATAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "GATAAA")))/2)])) %>%
+  unnest(GATAAA) %>% 
+  filter(GATAAA != -1)  %>% count(id) %>% mutate(GATAAA=n) %>% select(-n)
+
+TATAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(TATAAA=list(gregexpr('TATAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "TATAAA")))/2)])) %>%
+  unnest(TATAAA) %>% 
+  filter(TATAAA != -1)  %>% count(id) %>% mutate(TATAAA=n) %>% select(-n)
+
+ACTAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(ACTAAA=list(gregexpr('ACTAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "ACTAAA")))/2)])) %>%
+  unnest(ACTAAA) %>% 
+  filter(ACTAAA != -1)  %>% count(id) %>% mutate(ACTAAA=n) %>% select(-n)
+
+AGTAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AGTAAA=list(gregexpr('AGTAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AGTAAA")))/2)])) %>%
+  unnest(AGTAAA) %>% 
+  filter(AGTAAA != -1)  %>% count(id) %>% mutate(AGTAAA=n) %>% select(-n)
+
+ATTAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(ATTAAA=list(gregexpr('ATTAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "ATTAAA")))/2)])) %>%
+  unnest(ATTAAA) %>% 
+  filter(ATTAAA!= -1)  %>% count(id) %>% mutate(ATTAAA=n) %>% select(-n)
+
+AAAAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AAAAAA=list(gregexpr('AAAAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AAAAAA")))/2)])) %>%
+  unnest(AAAAAA) %>% 
+  filter(AAAAAA!= -1)  %>% count(id) %>% mutate(AAAAAA=n) %>% select(-n)
+
+AACAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AACAAA=list(gregexpr('AACAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AACAAA")))/2)])) %>%
+  unnest(AACAAA) %>% 
+  filter(AACAAA!= -1)  %>% count(id) %>% mutate(AACAAA=n) %>% select(-n)
+
+AAGAAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AAGAAA=list(gregexpr('AAGAAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AAGAAA")))/2)])) %>%
+  unnest(AAGAAA) %>% 
+  filter(AAGAAA!= -1)  %>% count(id) %>% mutate(AAGAAA=n) %>% select(-n)
+
+AATCAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATCAA=list(gregexpr('AATCAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATCAA")))/2)])) %>%
+  unnest(AATCAA) %>% 
+  filter(AATCAA!= -1)  %>% count(id) %>% mutate(AATCAA=n) %>% select(-n)
+
+AATGAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATGAA=list(gregexpr('AATGAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATGAA")))/2)])) %>%
+  unnest(AATGAA) %>% 
+  filter(AATGAA!= -1)  %>% count(id) %>% mutate(AATGAA=n) %>% select(-n)
+
+AATTAA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATTAA=list(gregexpr('AATTAA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATTAA")))/2)])) %>%
+  unnest(AATTAA) %>% 
+  filter(AATTAA!= -1) %>% count(id) %>% mutate(AATTAA=n) %>% select(-n)
+
+AATACA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATACA=list(gregexpr('AATACA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATACA")))/2)])) %>%
+  unnest(AATACA) %>% 
+  filter(AATACA!= -1)  %>% count(id) %>% mutate(AATACA=n) %>% select(-n)
+
+AATAGA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATAGA=list(gregexpr('AATAGA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATAGA")))/2)])) %>%
+  unnest(AATAGA) %>% 
+  filter(AATAGA!= -1)  %>% count(id) %>% mutate(AATAGA=n) %>% select(-n)
+
+AATATA <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATATA=list(gregexpr('AATATA', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATATA")))/2)])) %>%
+  unnest(AATATA) %>% 
+  filter(AATATA!= -1)  %>% count(id) %>% mutate(AATATA=n) %>% select(-n)
+
+AATAAC <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATAAC=list(gregexpr('AATAAC', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATAAC")))/2)])) %>%
+  unnest(AATAAC) %>% 
+  filter(AATAAC!= -1)  %>% count(id) %>% mutate(AATAAC=n) %>% select(-n)
+
+AATAAG <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATAAG=list(gregexpr('AATAAG', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATAAG")))/2)])) %>%
+  unnest(AATAAG) %>% 
+  filter(AATAAG!= -1)  %>% count(id) %>% mutate(AATAAG=n) %>% select(-n)
+
+AATAAT <- all_terms %>% 
+  rowwise() %>% 
+  mutate(AATAAT=list(gregexpr('AATAAT', seq)[[1]][1:(length(unlist(str_locate_all(seq, "AATAAT")))/2)])) %>%
+  unnest(AATAAT) %>% 
+  filter(AATAAT!= -1)   %>% count(id) %>% mutate(AATAAT=n) %>% select(-n)
+
+
+```
+
+```{r}
+for (i in AATAAA_mutations) {
+  x= as.name(i)
+  print(x)
+}
+```
+
+
+
+
+```{r}
+#blah <- data_seq %>% 
+blah <- data_seq %>%
+  select(id,mean_enrichment) %>% 
+  left_join(AATAAA,by='id') %>% 
+  left_join(CATAAA,by='id') %>% 
+  left_join(GATAAA,by='id') %>% 
+  left_join(TATAAA,by='id') %>% 
+  left_join(ACTAAA,by='id') %>%
+  left_join(AGTAAA,by='id') %>%
+  left_join(ATTAAA,by='id') %>%
+  left_join(AAAAAA,by='id') %>%
+  left_join(AACAAA,by='id') %>%
+  left_join(AAGAAA,by='id') %>%
+  left_join(AATCAA,by='id') %>%
+  left_join(AATGAA,by='id') %>%
+  left_join(AATTAA,by='id') %>%
+  left_join(AATACA,by='id') %>%
+  left_join(AATAGA,by='id') %>%
+  left_join(AATATA,by='id') %>%
+  left_join(AATAAC,by='id') %>%
+  left_join(AATAAG,by='id') %>%
+  left_join(AATAAT,by='id')
+blah
+```
+
+```{r}
+blahblah <- blah %>% 
+  pivot_longer(!c(id,mean_enrichment),names_to="type",values_to="count") %>% 
+  filter(!is.na(count)) 
+```
+
+```{r}
+empty <- data_seq %>% 
+  select(id,mean_enrichment) %>% mutate(type="None") %>% mutate(count=0) %>% filter(!(id %in% blahblah$id))
+```
+
+
+```{r}
+finalblah <- merge(blahblah,empty,all=TRUE)
+
+finalblah %>% 
+group_by(type) %>%
+  summarize(median=median(mean_enrichment,na.rm=TRUE))
+```
+
+```{r}
+level_order <- blahblah %>% group_by(type) %>% summarize(Mean=mean(mean_enrichment)) %>% arrange(desc(Mean)) %>% pull(type)
+level_order <- c(level_order,"None")
+finalblah %>% 
+  ggplot(aes(x=factor(type,level=level_order),y=mean_enrichment,fill=factor(type,level=level_order))) + 
+  geom_violin() + 
+  geom_boxplot(width=.5,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("AATAAA variations") + 
+  ylim(c(-6.5,1)) + 
+  ylab(expression(log[2]('terminator strength'))) + 
+  scale_fill_manual(values=pnw_palette("Bay",20)) + 
+   stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "None",size=2) 
+
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7A.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure7A.pdf")
+```
+
+
+```{r}
+rothnie <- read_tsv("Rothnie1994.tsv") %>% mutate(type=gsub('U','T',type))
+comp <- finalblah %>% group_by(type) %>% summarize(Mean=mean(mean_enrichment),Median=median(mean_enrichment)) %>% ungroup() %>% mutate(Perc = 2.921991/(-1*Mean)*100) %>% left_join(rothnie,by='type') %>% na.omit()
+
+comp %>% write_tsv("Rothnie_compare.tsv")
+
+cor.test(comp$Mean,comp$Rothnie_percentage,method = "pearson") 
+```
+
+```{r}
+cor_spearman <- cor.test(comp$Mean, comp$Rothnie_percentage, method = "spearman")$estimate
+cor_pearson <- cor.test(comp$Mean, comp$Rothnie_percentage, method = "pearson")$estimate
+
+ggplot(comp, aes(x = Mean, y = Rothnie_percentage)) +
+  geom_point() +  # Add points for each data point
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a line of best fit
+  geom_text(x = max(comp$Mean), y = min(comp$Rothnie_percentage), 
+            label = paste("R=", round(cor_pearson, 3)), 
+            hjust = 1, vjust = 0, color = "blue",size=8) +  # Add text for correlation coefficient
+  labs(title = "AAUAAA variations compared to Rothnie 1994",
+       x = "Mean STARR-seq strength per motif",
+       y = "Rothnie Percentage for motif 35S") +
+  theme_classic(base_size=18) 
+```
+
+
+
+```{r}
+ggplot(comp, aes(x = Mean, y = Rothnie_percentage)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, formula = y ~ x, col = "blue") +
+  theme_classic(base_size=12) +
+  theme(aspect.ratio = 1) +
+  stat_poly_line() +
+  stat_poly_eq() +
+  ylab("Percentage of cleavage in Rothnie et al.") +
+  xlab("mean STARR-seq terminator strength of corresponding AAUAAA variants") 
+```
+
+```{r}
+#blah <- data_seq %>% 
+bill <- polyEff %>%
+  select(id,polyEff) %>% 
+  left_join(AATAAA,by='id') %>% 
+  left_join(CATAAA,by='id') %>% 
+  left_join(GATAAA,by='id') %>% 
+  left_join(TATAAA,by='id') %>% 
+  left_join(ACTAAA,by='id') %>%
+  left_join(AGTAAA,by='id') %>%
+  left_join(ATTAAA,by='id') %>%
+  left_join(AAAAAA,by='id') %>%
+  left_join(AACAAA,by='id') %>%
+  left_join(AAGAAA,by='id') %>%
+  left_join(AATCAA,by='id') %>%
+  left_join(AATGAA,by='id') %>%
+  left_join(AATTAA,by='id') %>%
+  left_join(AATACA,by='id') %>%
+  left_join(AATAGA,by='id') %>%
+  left_join(AATATA,by='id') %>%
+  left_join(AATAAC,by='id') %>%
+  left_join(AATAAG,by='id') %>%
+  left_join(AATAAT,by='id')
+bill
+```
+
+```{r}
+billbill <- bill %>% 
+  pivot_longer(!c(id,polyEff),names_to="type",values_to="count") %>% 
+  filter(!is.na(count)) 
+billbill
+```
+
+```{r}
+empty <- polyEff %>% 
+  select(id,polyEff) %>% mutate(type="None") %>% mutate(count=0) %>% filter(!(id %in% billbill$id))
+```
+
+
+```{r}
+finalbill <- merge(billbill,empty,all=TRUE)
+finalbill
+```
+
+```{r}
+level_order <- billbill %>% group_by(type) %>% summarize(Mean=mean(polyEff)) %>% arrange(desc(Mean)) %>% pull(type)
+level_order <- c(level_order,"None")
+finalbill %>% 
+  ggplot(aes(x=factor(type,level=level_order),y=polyEff,fill=factor(type,level=level_order))) + 
+  geom_violin(draw_quantiles = c(0.5)) + 
+ # geom_boxplot(width=.1,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  stat_summary(
+    fun.y = median,  # Use median as the summary function
+    geom = 'point',  # Use a point to represent the median
+    position = position_dodge(0.9),
+    color = 'black',   # Customize the color of the points
+    size = 3         # Customize the size of the points
+  ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("AATAAA variations") + 
+  ylim(c(-.05,1)) + 
+  ylab("Cleavage Efficiency") + 
+  scale_fill_manual(values=pnw_palette("Bay",20))
+```
+
+```{r}
+bar <- finalbill %>% group_by(type) %>% summarize(Mean=mean(polyEff),Median=median(polyEff)) %>% arrange(desc(Mean)) %>% ungroup() %>% left_join(rothnie,by='type') %>% na.omit() 
+cor.test(bar$Mean,bar$Rothnie_percentage,method = "spearman") 
+cor.test(bar$Median,bar$Rothnie_percentage,method = "spearman") 
+```
+```{r}
+cor_spearman <- cor.test(bar$Mean,bar$Rothnie_percentage,method = "spearman")$estimate
+ggplot(bar, aes(x = Mean, y = Rothnie_percentage)) +
+  geom_point() +  # Add points for each data point
+  geom_smooth(method = "lm", se = FALSE, color = "red") +  # Add a line of best fit
+  geom_text(x = max(bar$Mean), y = min(bar$Rothnie_percentage), 
+            label = paste("Spearman's rho =", round(cor_spearman, 3)), 
+            hjust = 1, vjust = 0, color = "blue") +  # Add text for correlation coefficient
+  labs(title = "AAUAAA motif variations compared to Rothnie 1994 CaMV",
+       x = "Mean cleavage efficiency per motif",
+       y = "Rothnie Percentage for motif 35S") +
+  theme_classic() 
+```
+Does the number of UGUAs per motif affect cleavage eff and term score
+```{r}
+foobar <- all_terms %>%  rowwise() %>% 
+  mutate(UGUA=str_count(seq,'TGTA')) %>%
+  mutate(AAUAA= str_count(seq,'AATAA')) %>% 
+  left_join(data_seq %>% mutate(tobacco=mean_enrichment) %>% select(id,tobacco), by='id') %>%
+  left_join(data_seq_proto %>% mutate(protoplasts=mean_enrichment) %>% select(id,protoplasts), by='id') %>%
+  left_join(polyEff, by='id') %>%
+  select(UGUA,AAUAA,tobacco,protoplasts,polyEff) %>%
+  na.omit() %>% 
+  mutate_all(as.numeric) %>%
+  cor(method='spearman')
+
+corrplot(foobar, method = 'color')
+
+#%>% ggplot() + geom_tile(aes(x=UGUA,y=AAUAA, fill=tobacco))
+```
+
+```{r}
+scale_values <- function(x){(x-min(x))/(max(x)-min(x))}
+
+mydata <- all_terms %>%  rowwise() %>% 
+  mutate(UGUA=str_count(seq,'TGTA')) %>%
+  mutate(AAUAA= str_count(seq,'AATAA')) %>% 
+  left_join(data_seq %>% mutate(tobacco=mean_enrichment) %>% select(id,tobacco), by='id') %>%
+  left_join(data_seq_proto %>% ungroup() %>% mutate(protoplasts=mean_enrichment) %>% select(id,protoplasts), by='id') %>%
+  left_join(polyEff, by='id') %>%
+  select(id,UGUA,AAUAA,tobacco,protoplasts,polyEff) %>%
+  na.omit() %>% 
+  mutate(
+    Grade = case_when(
+      UGUA==0 && AAUAA == 0 ~ "XX",
+      UGUA>0 && AAUAA == 0 ~ "OX",
+      UGUA==0 && AAUAA > 0 ~ "XO",
+      UGUA>0 && AAUAA > 0 ~ "OO",
+    )) 
+mydata 
+
+```
+
+```{r}
+mydata %>%  
+  filter(AAUAA <= 4) %>%
+  mutate(haveUGUA = if_else(UGUA==0,"None","with UGUA")) %>%
+  ggplot(aes(x=as.factor(AAUAA),y=tobacco,fill=as.factor(haveUGUA))) + 
+  geom_violin() + 
+  #geom_boxplot(width=.1,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  stat_summary(
+    fun.y = median,  # Use median as the summary function
+    geom = 'point',  # Use a point to represent the median
+    position = position_dodge(0.9),
+    color = 'black',   # Customize the color of the points
+    size = 3         # Customize the size of the points
+  ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("Number of AAUAAA") + 
+  #ylim(c(.6,1)) + 
+  #ylab("Cleavage Efficiency") + 
+  scale_fill_manual(values=pnw_palette("Bay",2))
+```
+
+```{r}
+mydata %>%  
+  filter(UGUA <= 7) %>% 
+  mutate(haveUGUA = if_else(UGUA==0,"None","with UGUA")) %>%
+  mutate(haveAAUAA = if_else(AAUAA==0,"None","with AAUAA")) %>%
+  ggplot(aes(x=as.factor(UGUA),y=tobacco,fill=as.factor(haveAAUAA))) + 
+  geom_violin() + 
+  #geom_boxplot(width=.1,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  stat_summary(
+    fun.y = median,  # Use median as the summary function
+    geom = 'point',  # Use a point to represent the median
+    position = position_dodge(0.9),
+    color = 'black',   # Customize the color of the points
+    size = 3         # Customize the size of the points
+  ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("Number of UGUA") + 
+  ylim(c(-6.5,1)) + 
+   ylab(expression(log[2]('terminator strength'))) + 
+  scale_fill_manual(values=pnw_palette("Bay",2)) 
+```
+
+
+```{r}
+mydata %>%  
+  filter(UGUA <= 7) %>% 
+  mutate(haveUGUA = if_else(UGUA==0,"None","with UGUA")) %>%
+  mutate(haveAAUAA = if_else(AAUAA==0,"None","with AAUAA")) %>%
+  ggplot(aes(x=as.factor(UGUA),y=tobacco, fill=as.factor(UGUA))) + 
+  geom_violin() + 
+  geom_boxplot(width=.3,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  # stat_summary(
+  #   fun.y = median,  # Use median as the summary function
+  #   geom = 'point',  # Use a point to represent the median
+  #   position = position_dodge(0.9),
+  #   color = 'black',   # Customize the color of the points
+  #   size = 3         # Customize the size of the points
+  # ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("Number of UGUA") + 
+  ylim(c(-6.5,1)) + 
+   ylab(expression(log[2]('terminator strength'))) + 
+  scale_fill_manual(values=pnw_palette("Bay",8)) +
+   geom_signif(map_signif_level = FALSE,
+                     comparisons =  list(c("0","1"),c("1","2"),c("2","3"),c("3","4"),c("4","5"),c("5","6"),c("6","7"))) 
+```
+
+```{r}
+mydata %>%  
+  filter(UGUA <= 7) %>% 
+  group_by(UGUA) %>%
+  summarize(median=median(protoplasts,na.rm=TRUE))
+```
+
+
+
+```{r}
+mydata %>%  
+  filter(UGUA <= 7) %>% 
+  mutate(haveUGUA = if_else(UGUA==0,"None","with UGUA")) %>%
+  mutate(haveAAUAA = if_else(AAUAA==0,"None","with AAUAA")) %>%
+  ggplot(aes(x=as.factor(UGUA),y=protoplasts,fill=as.factor(haveAAUAA))) + 
+  geom_violin() + 
+  #geom_boxplot(width=.1,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  stat_summary(
+    fun.y = median,  # Use median as the summary function
+    geom = 'point',  # Use a point to represent the median
+    position = position_dodge(0.9),
+    color = 'black',   # Customize the color of the points
+    size = 3         # Customize the size of the points
+  ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("Number of UGUA") + 
+  ylim(c(-4.5,1)) + 
+    ylab(expression(log[2]('terminator strength'))) + 
+  scale_fill_manual(values=pnw_palette("Bay",2)) 
+```
+
+
+
+```{r}
+mydata %>%  
+  filter(UGUA <= 7) %>% 
+ # mutate(haveUGUA = if_else(UGUA==0,"None","with UGUA")) %>%
+#  mutate(haveAAUAA = if_else(AAUAA==0,"None","with AAUAA")) %>%
+  ggplot(aes(x=as.factor(UGUA),y=protoplasts,fill=as.factor(UGUA))) + 
+  geom_violin() + 
+  geom_boxplot(width=.3,coef=6,fill="white")  + 
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 8/.pt,
+    position = position_dodge(0.9),
+  ) + 
+  # stat_summary(
+  #   fun.y = median,  # Use median as the summary function
+  #   geom = 'point',  # Use a point to represent the median
+  #   position = position_dodge(0.9),
+  #   color = 'black',   # Customize the color of the points
+  #   size = 3         # Customize the size of the points
+  # ) +
+  theme_classic(base_size = 18) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
+        legend.position = "None",
+        aspect.ratio = .3) + 
+  xlab("Number of UGUA") + 
+  ylim(c(-4.5,1.5)) + 
+    ylab(expression(log[2]('terminator strength'))) + 
+  scale_fill_manual(values=pnw_palette("Bay",8)) +   
+  geom_signif(map_signif_level = FALSE,
+                     comparisons =  list(c("0","1"),c("1","2"),c("2","3"),c("3","4"),c("4","5"),c("5","6"),c("6","7"))) 
+```
+
+
+```{r}
+mydata %>% filter(UGUA <=10) %>% ggplot(aes(AAUAA,UGUA,fill=polyEff)) + 
+  geom_tile() + 
+  scale_fill_gradient(low='yellow',high='darkred')+
+  theme_classic2(base_size=18) + 
+  coord_equal() + 
+  theme(panel.background = element_rect(colour = "black", size=1, fill=NA)) + 
+  scale_y_continuous(breaks = seq(0, 10, 2)) +
+  xlab("number of AAUAA") + 
+  ylab("number of UGUA")
+
+```
+
+
+```{r}
+all_terms %>% 
+  filter(Species=="Arabidopsis", Controls=="Gene") %>% 
+  filter(!grepl("_2$", id)) %>% 
+  left_join(polyEff,by='id') %>% 
+  mutate(keep60 = if_else(polyEff >= .6,1,0)) %>%
+  mutate(keep80 = if_else(polyEff >= .8,1,0)) %>%
+  count(keep80)
+```
+```{r}
+#how many have over 60%
+18741/(18741 + 1806 + 1672)*100
+```
+
+```{r}
+#how many have over 80%
+16118	/(16118 + 4429 + 1672)*100
+```
+
+
+
+
 
 
