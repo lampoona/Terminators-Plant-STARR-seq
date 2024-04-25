@@ -1093,6 +1093,7 @@ unnest(c(G_list,A_list,C_list,T_list,pos)) %>%
   ylab("Pearson's R") +
   xlab("Position relative to cleavage site") + 
   theme_classic(base_size=18)
+
   ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3E.png")
   ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure3E.pdf")
 ```

@@ -1,0 +1,1715 @@
+---
+title: "Cleavage_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(ggpubr)
+library(tidyverse)
+library(dplyr)
+library(PNWColors)
+library(ggsignif)
+library(stringr)
+library(readr)
+library(ggrepel)
+library(gprofiler2)
+library(Biostrings)
+library(universalmotif)
+library(ggpubr)
+library(MetBrewer)
+library(PLColors)
+```
+
+```{r}
+load("RData/Cleavage.Rdata")
+```
+
+
+
+```{r}
+### function to display sample size on plot
+give.n <- function(x, y = -Inf, vjust = -1, size = 8/.pt){
+  return(c(y = y, vjust = vjust, size = size, label = length(x)))
+}
+```
+
+```{r}
+#Cleavage <- read.table("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/Cleavage_final.tsv",header=TRUE)
+#Cleavage %>% arrange(desc(total_reads))
+```
+
+
+```{r}
+Cleavage %>% 
+  filter(peak!=222) %>% 
+  filter(total_reads >= 1000) %>% 
+  count(id) %>% mutate(one_over_PACS=1/(n)) %>% 
+  left_join(data_seq,by="id") %>% 
+  ggplot(aes(x=log(one_over_PACS),y=mean_enrichment)) + 
+  geom_point() + 
+  theme_bw(base_size = 10)  +  
+  geom_smooth(method="lm", se=FALSE) +
+  stat_regline_equation(label.y = 1, aes(label = ..eq.label..)) +
+  stat_regline_equation(label.y = .5, aes(label = ..rr.label..))
+```
+
+```{r}
+Cleavage %>% 
+  filter(peak!=222) %>% 
+  filter(total_reads >= 1000) %>% 
+  mutate(window=substr(seq,peak-4,peak+5)) %>% 
+  select(id,peak,window) %>%
+  mutate(row=row_number()) %>%
+  mutate(new_id = paste(">",id,row,sep="")) %>% 
+  select(new_id,window) %>% 
+  write_tsv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/all_peaks_window.tsv", col_names = FALSE)
+```
+
+
+
+```{r}
+Cleavage %>% group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  #ungroup() %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot() + 
+  geom_point(aes(x=counts,y=mean_enrichment))
+  
+```
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  #ungroup() %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  #filter(average >= 20) %>%
+  filter(total_reads >= 1000) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot() + 
+  geom_hex(aes(x=average,y=mean_enrichment)) + 
+  theme_bw()
+```
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(percent_of_top_cleaves=counts/sum_of_top_cleaves * 100) %>% 
+  filter(percent_of_top_cleaves == max(percent_of_top_cleaves, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000) %>%
+  ggplot() + 
+  geom_histogram(aes(x=percent_of_top_cleaves),binwidth = 1, fill="#0f85a0") + 
+  theme_classic(base_size = 18) + 
+  theme(aspect.ratio = .9) + 
+  annotate(geom="text", x=22, y=500, label="n = 22,502", size=6) 
+```
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  mutate(average_bin=cut(average,breaks=seq(0, 100, 20),labels=c("0-20","21-40","41-60","61-80","81-100"))) %>% 
+  left_join(data_seq,by='id') %>%
+  filter(average_bin %in% c("61-80","81-100")) %>%
+   group_by(average_bin) %>% 
+ #  summarise(median=median(mean_enrichment, na.rm=TRUE)) %>%
+ # ungroup()
+summarise(enrichment_values = list(mean_enrichment)) %>%
+pull(enrichment_values) %>%
+{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  mutate(average_bin=cut(average,breaks=seq(0, 100, 20),labels=c("0-20","21-40","41-60","61-80","81-100"))) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot(aes(x=average_bin,y=mean_enrichment,fill=as.factor(average_bin))) + 
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_classic(
+    base_size = 18
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  geom_signif(comparisons = list(c("0-20","21-40")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("21-40","41-60")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("41-60","61-80")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("61-80","81-100")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) + 
+  xlab("main cleavage site (% of reads)") +
+  ylab(expression(log[2]('terminator strength'))) + 
+  ylim(c(-6.0,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) + 
+  scale_fill_manual(values = pnw_palette("Bay",5)) #+ 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8F.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8F.pdf")
+```
+
+```{r}
+Cleavage %>%
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  group_by(id) %>% 
+  summarize(npeaks= case_when(
+    n()== 1 ~ "one",
+    n()==2 ~ "two",
+    n()>=3 ~ "threeplus"
+   )) %>%
+  ungroup() %>%
+  left_join(data_seq, by='id') %>%
+  ggplot(aes(x=npeaks, y=mean_enrichment)) +
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_classic(
+    base_size = 18
+  )
+```
+
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  mutate(average_bin=cut(average,breaks=seq(0, 100, 20),labels=c("0-20","21-40","41-60","61-80","81-100"))) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot(aes(x=average_bin,y=mean_enrichment,fill=as.factor(average_bin))) + 
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_classic(
+    base_size = 18
+  )
+```
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>%
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  filter(peak <= 170) %>%
+  mutate(decile=ntile(average,5)) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot(aes(x=as.factor(decile),y=mean_enrichment,fill=as.factor(decile))) + 
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_bw(
+    base_size = 18
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  xlab("Quantile of top cleavage site read percentage") +
+  ylab(expression(log[2]('enrichment'))) + 
+  ylim(c(-5.5,.5)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) + 
+  scale_fill_manual(values = pnw_palette("Bay",5)) + 
+  ggtitle("Cleavage site % ~ enrichment")
+```
+
+
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>%
+  filter(total_reads >= 1000) %>% 
+  filter(peak!=222) %>%
+  mutate(average_bin=cut(average,breaks=seq(0, 100, 20),labels=c("0-20","21-40","41-60","61-80","81-100"))) %>% 
+  left_join(data_seq,by='id') %>% 
+  ggplot(aes(x=average_bin,y=log10(total_reads),fill=as.factor(average_bin))) + 
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_bw(
+    base_size = 18
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 10/.pt,
+    position = position_dodge(0.9),
+  ) +
+  geom_signif(comparisons = list(c("0-20","21-40")), y_position = log10(65000),
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("21-40","41-60")), y_position = log10(65000),
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("41-60","61-80")), y_position = log10(65000),
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("61-80","81-100")), y_position = log10(65000),
+              vjust = .1,map_signif_level = TRUE) + 
+  xlab("bins of top cleavage site read percentage") +
+  ylab(expression(log[10]('total reads'))) + 
+  ylim(c(log10(500),log10(85000))) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) + 
+  scale_fill_manual(values = pnw_palette("Bay",5)) + 
+  ggtitle("Cleavage site % ~ total reads")
+```
+
+
+
+```{r}
+#Cleavage <- Cleavage %>% 
+#  group_by(id) %>% 
+#  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+#  mutate(average=counts/sum_of_top_cleaves * 100) %>% 
+#  ungroup() %>%
+#  select(peak,counts,id,total_reads,percent_reads,sum_of_top_cleaves,average,seq,real_seq)
+#save(Cleavage, file = '/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/RData/Cleavage.Rdata')
+```
+
+
+```{r}
+Cleavage %>% mutate(adapted_seq=substr(seq,0,peak+1)) %>%
+  select(peak,counts,id,total_reads,percent_reads,sum_of_top_cleaves,average,adapted_seq) %>%
+  select(id,adapted_seq) %>%
+  mutate(row_id=row_number()) %>%
+  mutate(new_id=paste(">",id,row_id,sep="")) %>%
+  select(new_id,adapted_seq) %>%
+  write_tsv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/sequences_adapted_by_cleavage_site.tsv",col_names = FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' sequences_adapted_by_cleavage_site.tsv > sequences_adapted_by_cleavage_site.fa
+
+```{r}
+Cleavage %>% 
+  filter(peak >= 60) %>% 
+  mutate(adapted_seq=substr(seq,peak-59,peak+1)) %>%
+  select(peak,counts,id,total_reads,percent_reads,sum_of_top_cleaves,average,adapted_seq) %>%
+  select(id,adapted_seq) %>%
+  mutate(row_id=row_number()) %>%
+  mutate(new_id=paste(">",id,row_id,sep="")) %>%
+  select(new_id,adapted_seq) %>%
+  write_tsv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/sequences_60_adapted_by_cleavage_site.tsv",col_names = FALSE)
+```
+awk -v OFS='\n' '{$1 = $1; print}' sequences_60_adapted_by_cleavage_site.tsv > sequences_60_adapted_by_cleavage_site.fa
+
+```{r}
+max_cleaves <- Cleavage %>% 
+  group_by(id) %>% 
+  mutate(sum_of_top_cleaves = sum(counts)) %>% 
+  select(peak,counts,sum_of_top_cleaves,total_reads,percent_reads) %>% 
+  mutate(percent_of_top_cleaves=counts/sum_of_top_cleaves * 100) %>% 
+  filter(percent_of_top_cleaves == max(percent_of_top_cleaves, na.rm=TRUE)) %>% 
+  filter(total_reads >= 1000)
+```
+
+
+
+
+
+#making cleaner tables for the cleavage sites
+```{r}
+t35S <- read.table("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/t35S_hist_PACs.tsv",header=TRUE)
+t35S_PACs <- read.table("/Users/sgorji/Documents/Terminators/terminator_git/terminators/cleavage/t35S_PACs.tsv",header=TRUE)
+t35S_PACs <- t35S_PACs %>% mutate(peaker=1)
+colnames(t35S_PACs) <- c("position","counts","peaker")
+t35S_PACs
+t35S <- t35S %>% full_join(t35S_PACs,by=c("position","counts")) %>% replace(is.na(.), 0)
+```
+
+```{r}
+t35S %>% ggplot() + 
+  geom_segment(aes(x=position,xend=position,y=0,yend=counts)) +
+  geom_point(data=t35S_PACs,aes(x=position,y=counts),col="red",size=3) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = 1) + 
+  #xlim(c(0,204)) +
+  ylab("Unique UMI counts") +
+  ggtitle("t35S Cleavage Site Map") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure9B.png", width=15)
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure9B.pdf", width=11)
+```
+
+```{r}
+Zm00001d004343_T002 <- read.table("Zm00001d004343_T002_hist_PACs.tsv",header=TRUE)
+Zm00001d004343_T002 %>%
+mutate(id='Zm00001d004343_T002') %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+  mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) %>%
+  ggplot() + 
+  geom_segment(aes(x=position,xend=position,y=0,yend=ratio)) +
+  geom_point(data=Zm00001d004343_T002 %>% 
+               mutate(id='Zm00001d004343_T002') %>%
+               left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+               mutate(ratio= counts/total_reads) %>%
+               mutate(peaker= peaker/total_reads) %>%
+               filter(peaker!=0),aes(x=position,y=peaker),col="red",size=4) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = 1) + 
+  xlab("Cleavage site position") +
+  ylab("% of all reads") +
+  xlim(c(0,170))
+
+```
+
+
+
+```{r}
+AT5G67490 %>% 
+  mutate(id='AT5G67490') %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+   mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) 
+```
+
+
+
+```{r}
+AT5G67490 <- read.table("AT5G67490_hist_PACs.tsv",header=TRUE)
+AT5G67490 %>% 
+  mutate(id='AT5G67490') %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+  mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) %>%
+  ggplot() + 
+  geom_segment(aes(x=position,xend=position,y=0,yend=ratio)) +
+  geom_point(data=AT5G67490 %>% 
+               mutate(id='AT5G67490') %>%
+               left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+               mutate(ratio= counts/total_reads) %>%
+               mutate(peaker= peaker/total_reads) %>%
+               filter(peaker!=0),aes(x=position,y=peaker),col="red",size=4) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = 1) + 
+  xlab("Cleavage site position") +
+  ylab("% of all reads") +
+  xlim(c(0,170))
+```
+
+
+```{r}
+AT1G53280 <- read.table("AT1G53280_hist_PACs.tsv",header=TRUE)
+AT1G53280 %>%
+  mutate(id='AT1G53280') %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+  mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) %>%
+  ggplot() + 
+  geom_segment(aes(x=position,xend=position,y=0,yend=ratio)) +
+  geom_point(data=AT1G53280 %>% 
+               mutate(id='AT1G53280') %>%
+               left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+               mutate(ratio= counts/total_reads) %>%
+               mutate(peaker= peaker/total_reads) %>%
+               filter(peaker!=0),aes(x=position,y=peaker),col="red",size=4) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = 1) + 
+  xlab("Cleavage site position") +
+  ylab("% of all reads") +
+  xlim(c(0,170))
+```
+
+```{r}
+Zm00001d021702_T001 <- read.table("Zm00001d021702_T001_hist_PACs.tsv",header=TRUE)
+Zm00001d021702_T001 %>% 
+  mutate(id='Zm00001d021702_T001') %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+  mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) %>%
+  ggplot() + 
+  geom_segment(aes(x=position,xend=position,y=0,yend=ratio)) +
+  geom_point(data=Zm00001d021702_T001 %>% 
+               mutate(id='Zm00001d021702_T001') %>%
+               left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+               mutate(ratio= counts/total_reads) %>%
+               mutate(peaker= peaker/total_reads) %>%
+               filter(peaker!=0),aes(x=position,y=peaker),col="red",size=4) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = 1) + 
+  xlab("Cleavage site position") +
+  ylab("% of all reads") +
+  xlim(c(0,170))
+```
+
+```{r}
+facet_cleavage %>%
+  mutate(id = str_replace_all(id, "_T001", "")) %>%
+  mutate(id = str_replace_all(id, "_T002", "")) %>% 
+  count(id)
+```
+
+
+
+```{r}
+Zm00001d004343_T002 <- read.table("Zm00001d004343_T002_hist_PACs.tsv",header=TRUE) %>% mutate(id='Zm00001d004343_T002')
+
+
+Zm00001d021702_T001 <- read.table("Zm00001d021702_T001_hist_PACs.tsv",header=TRUE) %>% mutate(id='Zm00001d021702_T001')
+
+AT1G53280 <- read.table("AT1G53280_hist_PACs.tsv",header=TRUE) %>%
+mutate(id='AT1G53280') 
+
+AT5G67490 <- read.table("AT5G67490_hist_PACs.tsv",header=TRUE) %>% 
+  mutate(id='AT5G67490') 
+
+facet_cleavage <- rbind(Zm00001d021702_T001,AT1G53280,Zm00001d004343_T002,AT5G67490) %>%
+  left_join(Cleavage %>% select(id,total_reads) %>% unique(),by='id') %>% 
+  group_by(id) %>% 
+  mutate(ratio= counts/total_reads) %>%
+  mutate(peaker= peaker/total_reads) %>%
+  ungroup() %>%
+  mutate(id = str_replace_all(id, "_T001", "")) %>%
+  mutate(id = str_replace_all(id, "_T002", "")) 
+
+facet_order <- c("Zm00001d021702", "AT1G53280", "Zm00001d004343", "AT5G67490")
+
+facet_cleavage$id <- factor(facet_cleavage$id , levels = facet_order)
+
+facet_cleavage %>%
+  ggplot() + 
+  facet_grid(cols = vars(id)) +
+  geom_segment(aes(x=position,xend=position,y=0,yend=ratio)) +
+  geom_point(
+    data=facet_cleavage %>% filter(peaker!=0),
+    aes(x=position,y=peaker),
+    col="red",
+    size=3) + 
+  theme_classic(base_size=18) + 
+  theme(aspect.ratio = .8,
+         strip.text = element_text(size = 18)) +  # Change the font size (e.g., 12)) + 
+  xlab("Cleavage site position") +
+  ylab("% of reads per terminator") +
+  xlim(c(0,170))
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8C.png", width=15)
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8C.pdf", width=11)
+```
+
+
+
+
+```{r}
+Cleavage %>% count(id)
+```
+
+
+```{r}
+Cleavage %>% 
+  filter(Species=="Maize") %>%
+  filter(Controls=="Gene") %>%
+  # group_by(id) %>% 
+  # filter(average == max(average, na.rm=TRUE)) %>% 
+  # ungroup() %>%
+  filter(peak>=145 & peak<=155) %>% 
+  count(id)
+```
+
+how often did we predict a cleavage at exactly the cleavage site? how often was the genomic context cleavage site the same as STARR-seq cleavage. 
+```{r}
+Cleavage %>% 
+  #filter(Species=="Maize") %>%
+  filter(Controls=="Positional_random") %>%
+  group_by(id) %>%
+  filter(average == max(average, na.rm=TRUE)) %>%
+  ungroup() %>%
+  filter(peak>=145 & peak<=155) %>% 
+  count(id)
+```
+
+
+```{r}
+33700/54825*100
+```
+
+how many terminators had the max cleavage site be around 150 
+```{r}
+17986/54825*100
+```
+
+
+```{r}
+G4_table <- Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  count(Controls) %>% mutate(sum=n) %>% select(Controls,sum)
+```
+
+```{r}
+Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  #group_by(id) %>% 
+  #filter(average == max(average, na.rm=TRUE)) %>% 
+  #ungroup() %>%
+  count(peak,Controls) %>% left_join(G4_table,by="Controls") %>% 
+  mutate(ratio=n/sum)
+```
+
+
+```{r}
+Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  #group_by(id) %>% 
+  #filter(average == max(average, na.rm=TRUE)) %>% 
+  #ungroup() %>%
+  count(peak,Controls) %>% left_join(G4_table,by="Controls") %>% 
+  mutate(ratio=n/sum) %>%
+  ggplot(aes(x=peak,y=ratio,color=Controls)) +
+  annotate("rect", xmin = 170, xmax = 222, ymin = 0, ymax = .23, alpha = .1,fill = "red") +
+  geom_point(size=3)+ 
+  theme_classic(
+    base_size=18
+  ) +
+  scale_color_manual("G4",values=pnw_palette("Bay",5)) + 
+  ylab("Frequency per G4 group") +
+  xlab("Cleavage site") +
+  theme(
+    legend.position = c(.2, .55),
+    legend.background = element_blank(),
+    legend.box.background = element_rect(colour = "black"),
+    aspect.ratio = .8
+    ) 
+```
+
+
+```{r}
+G4_names <- Cleavage %>% filter(Controls=="G4-AAAA" | Controls== "G4-AABB" |Controls== "G4-ABBB"| Controls== "G4-BBBB") %>% select(id) %>% mutate(new_id = gsub('.{5}$', '',id)) #%>% count(new_id)
+```
+
+```{r}
+Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  #group_by(id) %>% 
+  #filter(average == max(average, na.rm=TRUE)) %>% 
+  #ungroup() %>%
+  count(peak,Controls) %>%
+  ggplot(aes(x=peak,y=n,color=Controls)) +
+  geom_point(size=3)+ 
+  theme_classic(
+    base_size=18
+  ) +
+  scale_color_manual("G4",values=pnw_palette("Bay",5)) + 
+  ylab("Count") +
+  xlab("Cleavage site") +
+  theme(
+    legend.position = c(.2, .55),
+    legend.background = element_blank(),
+    legend.box.background = element_rect(colour = "black"),
+    aspect.ratio = .8
+    ) +
+  annotate("rect", xmin = 170, xmax = 222, ymin = 0, ymax = 150, alpha = .1,fill = "red")
+```
+
+
+```{r}
+Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  #group_by(id) %>% 
+ # filter(average == max(average, na.rm=TRUE)) %>% 
+ # ungroup() %>%
+  ggplot(aes(peak, color=factor(Controls))) +
+  #geom_histogram(aes(x=peak),binwidth=1) +
+  geom_density(alpha=0.2) + 
+  theme_classic2(base_size = 18) +
+  #scale_fill_manual("Type",values = pnw_palette("Bay",5)) +
+  scale_color_manual("Type",values = pnw_palette("Bay",5)) +
+  xlab("Cleavage Site") +
+  theme(
+    legend.position = c(.25, .8),
+    aspect.ratio = .8
+    )  
+```
+
+
+```{r}
+level_order <- c('Terminators','CDS','Global random','Positional random')
+Cleavage %>%
+  mutate(Controls=gsub('ACGT_random','Global random',Controls)) %>%
+  mutate(Controls=gsub('Positional_random','Positional random',Controls)) %>%
+  mutate(Controls=gsub('Gene','Terminators',Controls)) %>%
+  filter(Controls %in% c('Terminators','Positional random','Global random','CDS')) %>% 
+  #filter(Controls %in% c('Gene','Positional_random','ACGT_random','CDS')) %>% 
+  ggplot(aes(peak, fill=factor(Controls, levels = level_order) ,color=factor(Controls, levels = level_order))) +
+  #geom_histogram(aes(x=peak),binwidth=1) +
+  geom_density(alpha=0.2) + 
+  theme_classic2(base_size = 18) +
+  scale_fill_manual("Type",values = pnw_palette("Bay",4)) +
+  scale_color_manual("Type",values = pnw_palette("Bay",4)) +
+  xlab("Cleavage Site") +
+  theme(
+    legend.position = c(.35, .8),
+    aspect.ratio = .8
+    ) 
+
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure9A.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/SuppFigure9A.pdf")
+```
+
+
+```{r}
+control_table <- Cleavage %>%
+  filter(Controls %in% c('Gene','Positional_random','ACGT_random','CDS')) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  count(Controls) %>%
+  mutate(sum=n) %>%
+  select(-n)
+control_table
+```
+
+
+```{r}
+level_order <- c('Gene','Positional_random','ACGT_random','CDS')
+Cleavage %>%
+  filter(Controls %in% c('Gene','Positional_random','ACGT_random','CDS')) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  count(peak,Controls) %>%
+  left_join(control_table, by="Controls") %>%
+  mutate(ratio=n/sum) %>%
+  ggplot(aes(x=peak,y=ratio, color=factor(Controls, levels = level_order))) +
+  geom_point(size=3) +
+  theme_classic() +
+  scale_color_manual("Type",values = pnw_palette("Bay",4)) 
+```
+
+```{r}
+Cleavage %>%
+  mutate(Controls=gsub('ACGT_random','Global random',Controls)) %>%
+  mutate(Controls=gsub('Positional_random','Positional random',Controls)) %>%
+  filter(Controls %in% c('Gene','Positional random','Global random','CDS')) %>% count(Controls)
+```
+
+
+```{r}
+level_order <- c('Terminators','CDS','Global random','Positional random')
+Cleavage %>%
+  mutate(Controls=gsub('ACGT_random','Global random',Controls)) %>%
+  mutate(Controls=gsub('Positional_random','Positional random',Controls)) %>%
+  mutate(Controls=gsub('Gene','Terminators',Controls)) %>%
+  filter(Controls %in% c('Terminators','Positional random','Global random','CDS')) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>%
+  ggplot(aes(peak, 
+             fill=factor(Controls, levels = level_order),
+             color=factor(Controls, levels = level_order))) +
+  #geom_histogram(aes(x=peak),binwidth=1) +
+  geom_density(alpha=0.3) + 
+  theme_classic2(base_size = 18) +
+  scale_fill_manual("Type",values = pnw_palette("Bay",4)) +
+  scale_color_manual("Type",values = pnw_palette("Bay",4)) +
+  xlab("Cleavage site position") +
+  theme(
+    legend.position = c(.2, .8),
+    aspect.ratio = .6, 
+    legend.title = element_blank()
+    ) + 
+  xlim(c(0,222)) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8D.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8D.pdf")
+```
+
+
+
+```{r}
+decile_table <- Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(-tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  count(decile)
+Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(-tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+#  group_by(id) %>% 
+ # filter(average == max(average, na.rm=TRUE)) %>% 
+#  ungroup() %>% 
+count(peak,decile)
+```
+
+Or make it a rainbow plot: plot the density of the main cleavage site distribution for terminators separated into groups based on their strength
+
+```{r}
+decile_table <- Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(-tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+ # group_by(id) %>% 
+  #filter(average == max(average, na.rm=TRUE)) %>% 
+  #ungroup() %>% 
+  count(decile)
+#decile_table
+ Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(-tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+#  group_by(id) %>% 
+ # filter(average == max(average, na.rm=TRUE)) %>% 
+#  ungroup() %>% 
+count(peak,decile) %>% 
+  left_join(decile_table %>% mutate(sum=n) %>% select(decile,sum),by="decile") %>% 
+  mutate(ratio=n/sum) %>%
+  ggplot(aes(x=peak,y=n,color=decile)) +
+  geom_point(size=3)+ 
+  theme_classic(
+    base_size=18
+  ) +
+  scale_color_manual("Decile",values=rev(pl_palette("pi",10))) + 
+  ylab("Count") +
+  xlab("Cleavage site") +
+  theme(
+    legend.position = c(.2, .55),
+    legend.background = element_blank(),
+    legend.box.background = element_rect(colour = "black"),
+    aspect.ratio = .8
+    ) #+
+  #annotate("rect", xmin = 170, xmax = 222, ymin = 0, ymax = 4400,
+   #        alpha = .1,fill = "red")
+
+```
+
+```{r}
+Cleavage %>% left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% mutate(decile = ntile(-tobacco, 10)) %>% select(id,tobacco,decile),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  ggplot(aes(peak,color=as.factor(decile))) +
+  geom_density(alpha=.2) + 
+  scale_color_manual("Deciles",values=rev(pl_palette("pi",10))) +
+  theme_classic(
+    base_size = 18,
+  ) +
+  theme(
+    legend.position = c(.2, .55),
+    aspect.ratio = .8
+    ) +
+  xlab("Cleavage Site")
+```
+
+
+
+```{r}
+Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=ntile(-tobacco,10)),by="id") %>%
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  ggplot(aes(peak,color=as.factor(decile))) +
+  geom_density(alpha=.2) + 
+  scale_color_manual("Deciles",values=rev(pl_palette("pi",10))) +
+  theme_classic(
+    base_size = 18,
+  ) +
+  theme(
+    legend.position = c(.2, .55),
+    aspect.ratio = .8
+    ) +
+  xlab("Cleavage Site") +
+  annotate("rect", xmin = 170, xmax = 222, ymin = 0, ymax = .11,
+           alpha = .1,fill = "red")
+  
+```
+
+
+
+```{r}
+decile_table <- Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  count(decile)
+decile_table
+```
+
+```{r}
+ Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+count(peak,decile) %>% 
+  left_join(decile_table %>% mutate(sum=n) %>% select(decile,sum),by="decile") 
+```
+
+
+```{r}
+ Cleavage %>% 
+left_join(data_seq %>% mutate(tobacco = mean_enrichment) %>% select(id,tobacco) %>% mutate(decile=as.factor(ntile(-tobacco,10))),by="id") %>% 
+  filter(!is.na(tobacco)) %>% 
+  arrange(desc(tobacco)) %>% 
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+count(peak,decile) %>% 
+  left_join(decile_table %>% mutate(sum=n) %>% select(decile,sum),by="decile") %>% 
+  mutate(ratio=n/sum) %>%
+  ggplot(aes(x=peak,y=ratio,color=decile)) +
+  geom_point(size=3)+ 
+  theme_classic(
+    base_size=18
+  ) +
+  scale_color_manual("Decile",values=rev(pl_palette("pi",10))) + 
+  ylab("Frequency per decile") +
+  xlab("Cleavage site position") +
+  theme(
+    legend.position = c(.2, .55),
+    legend.background = element_blank(),
+    legend.box.background = element_rect(colour = "black"),
+    aspect.ratio = .6
+    ) +
+  annotate("rect", xmin = 170, xmax = 222, ymin = 0, ymax = .6,
+           alpha = .1,fill = "red")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8E.png") 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8E.pdf") 
+``` 
+
+
+
+
+```{r}
+G4_names <- Cleavage %>% filter(Controls %in% c("G4-AAAA","G4-ABBB","G4-AABB","G4-BBBB")) %>% select(id) %>% mutate(new_id = gsub('.{5}$', '',id))
+Cleavage %>% filter(id %in% G4_names$new_id | id %in% G4_names$id) %>% 
+  ggplot(aes(peak, fill=Controls ,color=Controls)) +
+  geom_density(alpha=0.2) + 
+  theme_classic2(base_size = 18) +
+  #scale_fill_manual("Type",values = pnw_palette("Bay",4)) +
+  #scale_color_manual("Type",values = pnw_palette("Bay",4)) +
+  xlab("Cleavage Site") +
+  theme(
+    legend.position = c(.35, .8),
+    aspect.ratio = .8
+    ) + 
+  xlim(0,222)
+```
+
+maximum peaks
+```{r}
+motif <- Cleavage %>% group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>%
+  filter(peak <= 170 ) %>%
+  mutate(seq2=gsub("T","U",seq)) %>%
+  mutate(ten_window=substr(seq2,peak-4,peak+5)) %>%
+  select(id,ten_window) %>% pull(ten_window) %>%
+  create_motif()
+motif <- add_multifreq(motif, sample_sites(motif))
+view_motifs(motif)
+```
+second max
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>% 
+  filter(rank(-average, ties.method="min")==2)  %>% 
+  ungroup() %>%
+  mutate(seq2=gsub("T","U",seq)) %>%
+  filter(peak <= 170 ) %>%
+  mutate(ten_window=substr(seq2,peak-4,peak+5)) %>%
+  select(id,ten_window) %>% pull(ten_window) %>%
+  create_motif( )
+motif <- add_multifreq(motif, sample_sites(motif))
+view_motifs(motif)
+```
+
+all peaks
+```{r}
+motif <- Cleavage %>% 
+  mutate(seq2=gsub("T","U",seq)) %>%
+  filter(peak <= 170 ) %>%
+  mutate(ten_window=substr(seq2,peak-4,peak+5)) %>%
+  select(id,ten_window) %>% pull(ten_window) %>%
+  create_motif( )
+motif <- add_multifreq(motif, sample_sites(motif))
+view_motifs(motif)
+```
+
+What percentage was majorly polyadenylated
+how many had a secondary peak with at least 30%?
+
+```{r}
+Cleavage %>% 
+  filter(total_reads > 1000) %>%
+  filter(peak!=222) %>%
+  group_by(id) %>% 
+  slice_max(order_by = average, n = 2) %>%
+  ungroup() %>%
+  ggplot() + 
+  geom_histogram(aes(x=average),binwidth = 1, fill="#0f85a0") + 
+  theme_classic(base_size = 18) + 
+  theme(aspect.ratio = .9) #+ 
+  #annotate(geom="text", x=22, y=500, label="n = 22,502", size=6)
+  
+```
+
+
+
+```{r}
+Cleavage %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>%
+  ggplot(aes(peak, color=PAC)) +
+  geom_density(alpha=0.2) + 
+  theme_classic2(base_size = 18) +
+  scale_color_manual("Type",values = pl_palette("pi",2)) +
+  #scale_color_manual("Type",values = pnw_palette("Bay",4)) +
+  xlab("Cleavage Site") +
+  theme(
+    legend.position = c(.35, .8),
+    aspect.ratio = .8
+    ) + 
+  xlim(0,222)
+```
+
+Are secondary cleavage sites captured in our cleavage data? 
+```{r}
+arab_bed <- read.table("Arabidopsis_PACs_Thomas_plus_TAIR.bed",sep="\t")
+maize_bed <- read.table("Maize_Top_PACs_Final.bed",sep="\t") 
+gene_bed <- rbind(arab_bed,maize_bed)
+all_terms <- all_terms %>% left_join(gene_bed %>% mutate(start=V2) %>% mutate(end=V3) %>% mutate(id=V4) %>% mutate(strand=V6) %>% select(id,start,end,strand), by="id") 
+all_terms
+```
+
+
+
+if it's a negative strand: 
+diff = +, then secondary comes after primary
+diff = -, then secondary comes before primary
+
+if it's a positve strand:
+diff = +,then secondary comes before primary
+diff = -, then secondary comes after primary 
+
+There are 3,889 secondary sites within range of first peak (170 or less bases)
+
+
+```{r}
+Cleavage %>% filter(!is.na(PAC)) %>% mutate(keep = case_when(
+  PAC=="Primary" & (id %in% primary_names_list) ~ "Keep",
+  PAC=="Secondary" ~ "Keep"
+  )) %>% filter(keep=="Keep") %>%
+  group_by(id) %>% 
+  filter(average == max(average, na.rm=TRUE)) %>% 
+  ungroup() %>% 
+  arrange(id) %>%
+  mutate(new_id=gsub('_2','', id)) %>% 
+  filter(!grepl(";",new_id)) %>%
+  group_by(new_id) %>%
+  mutate(Diff = lag(start)-start) %>%
+  mutate(cleave_diff= lag(peak)-peak) %>%
+  ungroup() %>%
+  filter(!is.na(Diff)) %>%
+  filter(Diff!=0) %>%
+  filter(abs(Diff) <= 170) 
+  #secondary comes before primary
+
+```
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>%
+  filter(average == max(average, na.rm=TRUE)) %>%
+  mutate(temp = if_else(peak<=170, "Terminator","T-DNA")) %>%
+  ungroup() %>%
+  left_join(data_seq %>% select(id,mean_enrichment), by="id") %>%
+  group_by(temp) %>%
+  summarize(median=median(mean_enrichment, na.rm=TRUE))
+```
+
+
+is the top cleavage site in the sequence or outside (two bins )
+```{r}
+factor_order <- c("Terminator","T-DNA")
+Cleavage %>% 
+  group_by(id) %>%
+  filter(average == max(average, na.rm=TRUE)) %>%
+  mutate(temp = if_else(peak<=170, "Terminator","T-DNA")) %>%
+  ungroup() %>%
+  left_join(data_seq %>% select(id,mean_enrichment), by="id") %>%
+  ggplot(aes(x=factor(temp,levels = factor_order),y=mean_enrichment, fill=factor(temp,levels = factor_order))) + 
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 17/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab(expression(log[2]('terminator strength'))) +
+   ylim(c(-7,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1.8
+  ) +
+  xlab("Position of main cleavage site") +
+  #xlim(c(-6,1)) +
+  scale_fill_manual(values = pnw_palette("Bay",3)) +   
+  # geom_hline(
+  #   yintercept = 0,
+  #   col = "blue",
+  #   linetype = 2
+  # ) + 
+  #stat_compare_means(comparisons = list(c("T-DNA","Terminator")),label = "p.signif", method = "wilcox",size=6)  
+  geom_signif(comparisons = list(c("T-DNA","Terminator")), y_position = .5,
+              vjust = .1,map_signif_level = FALSE)
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8G.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8G.pdf")
+```
+
+
+
+```{r}
+Cleavage %>% 
+  group_by(id) %>%
+  filter(average == max(average, na.rm=TRUE)) %>%
+  mutate(temp = if_else(peak<=170, "Terminator","T-DNA")) %>%
+  ungroup() %>%
+  left_join(data_seq %>% select(id,mean_enrichment), by="id") %>%
+  drop_na(mean_enrichment) %>%
+  group_by(temp) %>% 
+  #summarize(median = median(mean_enrichment)) %>% 
+  #ungroup() 
+summarise(enrichment_values = list(mean_enrichment)) %>%
+pull(enrichment_values) %>%
+{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+```{r}
+2^(-3.279678 + 3.760135)
+```
+
+
+17524 that were only cut once (one primary only). This includes those cut in the plasmid, which means we dont know where they were cleaved
+9525 that were only cut in the plasmid, so they were never cut at all in our sequence
+
+7999 terminators had a single cleavage site that wasn't the plasmid
+
+9525 had a single cleavage site that was the plasmid 
+
+```{r}
+Cleavage %>% 
+  #filter(Species=="Maize") %>%
+  #filter(Controls=="Positional_random") %>%
+  group_by(id) %>%
+  filter(n()==1) %>% 
+  ungroup() %>%
+  #filter(peak!=222) 
+  filter(peak==222) %>%
+  count(id)
+```
+
+```{r}
+Cleavage %>% 
+ # filter(Species=="Maize") %>%
+  filter(Controls=="Positional_random") %>%
+  group_by(id) %>%
+  filter(n()>1) %>% 
+  ungroup() %>%
+  filter(peak!=222) %>%
+  count(id)
+  #filter(peak==222) 
+```
+
+```{r}
+Cleavage %>%
+  #filter(Species=="Maize") %>%
+  filter(Controls=="Positional_random") %>%
+  count(id)
+```
+
+
+how many terminators only had one peak that wasn't the plasmid
+7999 terminators had a single cleavage site. 
+7999/54825 * 100 = 14.5%
+
+How many terminators had a secondary cleavage site that had at least 30% of the reads?
+There are 37,301 terminators that are alternatively poly-adenylation (reports greater than 1 peak that, including those that were cut in the plasmid)  
+
+37301/54825 * 100 = 68.0% are alternatively polyadenylated ()
+
+of those, 7393 had a secondary site that had at least 30% of the reads. 
+so of the ones that are polyadenylated, 20% had clear secondary sites (7393/37301). 
+Of all tested sequences, 7393/54825, 13% had a strong secondary site.  
+
+
+```{r}
+Cleavage %>% 
+  #filter(Species=="Maize") %>%
+  filter(Controls=="Positional_random") %>%
+  filter(peak!=222) %>%
+  #filter(peak<=200) %>%
+  group_by(id) %>% 
+  filter(n()>=2) %>% 
+  #slice_max(order_by = average, n = 2) %>% 
+  filter(rank(-average) == 2) %>%
+  ungroup() %>% 
+  filter(average >= 30) %>% 
+  count(id)
+
+```
+including in polyA efficiency 
+```{r}
+polyEff <- read.table("polyEff_revised.txt") 
+colnames(polyEff) <- c('id','polyEff')
+polyEff
+```
+
+
+```{r}
+data_seq %>% left_join(polyEff,by='id') %>%
+  mutate(average_bin=cut(polyEff,breaks=seq(0, 1, .20),labels=c("0-20","21-40","41-60","61-80","81-100"))) %>% filter(is.na(average_bin))
+```
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  filter(!is.na(polyEff)) %>% 
+  arrange(desc(polyEff)) %>%
+  mutate(quantiles = ntile(polyEff, 5)) %>%
+  count(quantiles)
+ # mutate(average_bin=cut(polyEff,breaks=seq(0, 1, .20),labels=c("0-20","21-40","41-60","61-80","81-100"))) 
+```
+
+Selecting for highest cleavage and strength 
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  filter(!is.na(polyEff)) %>% 
+  arrange(desc(polyEff)) %>%
+  mutate(quantiles = cut(polyEff, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0), labels = FALSE, include.lowest = TRUE)) %>%
+  filter(mean_enrichment > -.5) %>%
+  filter(polyEff > .95) %>%
+  arrange(desc(mean_enrichment))
+  #write_tsv("highPolyEffplusStrength.tsv")
+
+```
+
+```{r}
+polyEff %>% left_join(Cleavage %>% select(id,total_reads), by='id') %>%
+  left_join(data_seq %>% mutate(tobacco=mean_enrichment) %>% select(id,tobacco), by='id') %>%
+  left_join(data_seq_proto %>% ungroup() %>% mutate(protoplasts=mean_enrichment) %>% select(id,protoplasts), by='id') %>%
+  unique() %>%
+  write_tsv("polyEff_plus_tobacco_protoplasts.tsv")
+```
+
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  filter(!is.na(polyEff)) %>% 
+  arrange(desc(polyEff)) %>%
+  mutate(quantiles = cut(polyEff, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0), labels = FALSE, include.lowest = TRUE)) %>%
+ ggplot(aes(x=as.factor(quantiles),y=mean_enrichment,fill=as.factor(quantiles))) + 
+  geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_classic(
+    base_size = 18
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 15/.pt,
+    position = position_dodge(0.9),
+  ) +
+  xlab("Cleavage probability") +
+  ylab(expression(log[2]('terminator strength'))) + 
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_x_discrete(labels = c("0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8","0.8-1.0")) + 
+  ylim(c(-6.5,1)) +
+  scale_fill_manual(values = pnw_palette("Bay",5)) +
+  geom_signif(comparisons = list(c("1","2")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("2","3")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("3","4")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE) +
+  geom_signif(comparisons = list(c("4","5")), y_position = .5,
+              vjust = .1,map_signif_level = TRUE)
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8H.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure8H.pdf")
+```
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  filter(!is.na(polyEff)) %>% 
+  arrange(desc(polyEff)) %>%
+  mutate(quantiles = cut(polyEff, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0), labels = FALSE, include.lowest = TRUE)) %>%
+  filter(quantiles %in% c(4,5)) %>%
+  group_by(quantiles) %>%
+  # summarize(median = median(mean_enrichment)) %>%
+  # ungroup()
+summarise(enrichment_values = list(mean_enrichment)) #%>%
+#pull(enrichment_values) %>%
+#{wilcox.test(.[[1]], .[[2]], alternative = "two.sided")}
+```
+
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  mutate(quantiles = cut_number(GC,n=5,
+                                labels=c("14-32", "32-35", "35-39", "39-43", "43-71")
+                                )) %>%
+  ggplot(aes(x=as.factor(quantiles),y=polyEff, fill=as.factor(quantiles))) + 
+geom_violin(alpha = 0.5) + 
+  geom_boxplot(width = 0.2,
+    outlier.shape = NA,
+    fill = 'white') +
+  theme_classic(
+    base_size = 18
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  xlab("GC content %") +
+  ylab("Cleavage probability") + 
+  ylim(c(-.1,1.1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",5)) +
+  geom_signif(comparisons = list(c("14-32","32-35"),c("32-35", "35-39"),c("35-39", "39-43"),c("39-43", "43-71")),map_signif_level = FALSE)
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9B.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9B.pdf")
+```
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  mutate(quantiles = cut_number(GC,n=5,
+                                labels=c("14-32", "32-35", "35-39", "39-43", "43-71")
+                                )) %>%
+  group_by(quantiles) %>% 
+  summarize(median=median(polyEff,na.rm=TRUE))
+```
+
+
+```{r}
+data_seq %>% 
+  ungroup() %>%
+  left_join(polyEff,by='id') %>%
+  mutate(quantiles = cut_number(GC,n=5)) %>%
+  drop_na(polyEff) %>%
+  summarise(
+    cor(GC, polyEff)^2
+  )
+  
+```
+
+```{r}
+level_order <- c('CDS', 'ACGT_random','Positional_random','Gene')
+  data_seq %>% 
+  left_join(polyEff,by='id') %>%
+  filter(Species == "Arabidopsis"|
+         Species == "Maize") %>%
+  filter(Controls!= "G4-AAAA", 
+           Controls!= "G4-ABBB", 
+           Controls!= "G4-AABB",
+           Controls!= "G4-BBBB", 
+           Controls!= "GC",
+           Controls!= "Control"
+         ) %>% 
+  ggplot(aes(x=factor(Controls, level=level_order),y=polyEff,fill=Controls)) +
+   facet_grid(cols = vars(Species)) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("Cleavage probability") +
+  ylim(c(-.15,1.05)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = 1
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",4)) +   
+  xlab("Type") +
+   stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "Gene",size=2,label.y = 1) +
+ scale_x_discrete(labels=c("Gene" = "Terminators", "CDS" = "CDS", "ACGT_random"="Global random",
+                              "Positional_random" = "Positional random")) 
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9A.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9A.pdf")
+```
+
+```{r}
+data_seq %>% 
+  left_join(polyEff,by='id') %>%
+  mutate(decile=as.factor(ntile(polyEff,10))) %>%
+  rowwise() %>% 
+  mutate(UGUA=str_count(seq,'TGTA')) %>%
+  mutate(AAUAA= str_count(seq,'AATAA')) %>%
+  filter(id=='t35S')
+```
+
+```{r}
+  data_seq %>% 
+  left_join(polyEff,by='id') %>%
+  filter(#pecies == "Arabidopsis"#|
+         Species == "Maize"
+         ) %>%
+  filter(Controls!= "G4-AAAA", 
+           Controls!= "G4-ABBB", 
+           Controls!= "G4-AABB",
+           Controls!= "G4-BBBB", 
+           Controls!= "GC",
+           Controls!= "Control"
+         ) %>% 
+  group_by(Controls) %>% 
+  summarize(median=median(polyEff, na.rm=TRUE))
+```
+
+
+
+```{r}
+data_seq %>% 
+  left_join(polyEff,by='id') %>%
+  mutate(decile=as.factor(ntile(polyEff,10))) %>%
+  rowwise() %>% 
+  mutate(UGUA=str_count(seq,'TGTA')) %>%
+  mutate(AAUAA= str_count(seq,'AATAA')) %>%
+  ggplot(aes(x=UGUA, y=AAUAA, fill=as.factor(decile))) +
+  geom_tile() +
+  theme_classic() +
+  scale_fill_manual(values=pl_palette("pi",n=10))
+```
+
+
+
+```{r}
+level_order = c("None","A","B","C","A+B","A+C","B+C","A+B+C")
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
+  motif == "2-AAUAAAAAWAWWWWU" ~ "A",
+  motif == "1-WUGUAAUDWWWWWWW" ~ "B",
+  motif == "4-UUGUUUBUWUUUUU" ~ "C"
+)) %>% group_by(sequence) %>% mutate(combo = paste0(unique(mootif),collapse="+")) %>% ungroup() %>% select(sequence,combo) %>% full_join(data_seq %>% mutate(sequence=id) %>% select(sequence,mean_enrichment,Species),by="sequence") %>%
+  left_join(polyEff %>% mutate(sequence=id),by='sequence') %>% 
+  filter(!is.na(mean_enrichment)) %>% unique() %>% mutate(combo=if_else(is.na(combo),"None",combo)) %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>% 
+  ggplot(aes(x=factor(combo,levels=level_order),y=polyEff,fill=factor(combo,levels=level_order))) +
+   # facet_grid(cols = vars(Species)) +
+    geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab('Cleavage Probability') +
+   ylim(c(-.1,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio = .7
+  ) +
+  scale_fill_manual(values = pnw_palette("Bay",8))   +
+  stat_compare_means(label = "p.format", method = "wilcox",
+                     ref.group = "None",size=4) 
+
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9D.png")
+#ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9D.pdf")
+```
+
+```{r}
+rbind(AAUAAA.pos,UGUA.pos,UUGUUUBUWUUUUU.pos) %>% mutate(mootif= case_when(
+  motif == "2-AAUAAAAAWAWWWWU" ~ "A",
+  motif == "1-WUGUAAUDWWWWWWW" ~ "B",
+  motif == "4-UUGUUUBUWUUUUU" ~ "C"
+)) %>% group_by(sequence) %>% mutate(combo = paste0(unique(mootif),collapse="+")) %>% ungroup() %>% select(sequence,combo) %>% full_join(data_seq %>% mutate(sequence=id) %>% select(sequence,mean_enrichment,Species),by="sequence") %>%
+  left_join(polyEff %>% mutate(sequence=id),by='sequence') %>% 
+  filter(!is.na(mean_enrichment)) %>% unique() %>% mutate(combo=if_else(is.na(combo),"None",combo)) %>%
+  filter(Species %in% c("Arabidopsis","Maize")) %>%
+  group_by(combo) %>% 
+  summarize(median=median(polyEff, na.rm=TRUE))
+```
+
+
+```{r}
+window.size <- 10
+n.windows <- nchar(data_seq$seq[1]) - window.size + 1
+tmp1 <- data_seq %>% 
+  filter(length == 170) %>%
+  #filter(Species=="Arabidopsis" | Species=="Maize") %>%
+  rowwise() %>%
+  mutate(
+    G_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"G")/10)) %>%
+  mutate( 
+    A_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"A")/10)) %>%
+  mutate(
+    C_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"C")/10)) %>%
+      mutate(
+    T_list = list(
+str_count(str_sub(seq, seq(from = 1, length.out = (nchar(seq) - window.size + 1)), seq(from = window.size, length.out = (nchar(seq) - window.size + 1))),"T")/10)) 
+```
+
+
+
+
+```{r}
+tmp1 %>% 
+  left_join(polyEff,by='id') %>% 
+  filter(!is.na(polyEff)) %>% 
+  filter(length==170) %>% 
+  #filter(Species=="Maize" | Species=="Arabidopsis") %>% 
+  select(id,Species,G_list,A_list,T_list,C_list,polyEff) %>% mutate(pos=list(seq(1,161,by=1))) %>%
+unnest(c(G_list,A_list,C_list,T_list,pos)) %>% 
+  group_by(pos,Species) %>% 
+  summarise(
+    G = cor(polyEff,G_list),
+    A = cor(polyEff,A_list),
+    T = cor(polyEff,T_list),
+    C = cor(polyEff,C_list)
+  ) %>% 
+   arrange(pos) %>% pivot_longer(!pos & !Species, names_to ="type", values_to="pearson") %>% 
+  group_by(pos,type) %>%
+  mutate(average=mean(pearson)) %>%
+  ungroup() %>%
+  mutate(pos1=pos-150) %>%
+  ggplot() + 
+  geom_hline(yintercept = 0,col='blue',linetype='dashed') +
+ # facet_grid(rows = vars(Species)) +
+  #geom_smooth(aes(x=pos,y=pearson,col=type),method = "lm", formula = y ~ poly(x, 3), se = FALSE) #+ 
+  geom_line(aes(x=pos1,y=average,col=type)) + 
+  scale_color_manual(values = met.brewer("Lakota",n=4)) +
+  ylab("Pearson's r") +
+  xlab("Position along terminator") + 
+  theme_classic(base_size=18) 
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9C.png")
+ggsave("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/Figures/Figure9C.pdf")
+```
+
+
+```{r}
+Cleavage %>% select(id,peak,counts,sum_of_top_cleaves,average) %>% 
+  group_by(id) %>% 
+  mutate(PAC_Rank=rank(-average)) %>%
+  ungroup() %>%
+  rename("peak"="PAC location in terminator","counts"="UMI read counts","sum_of_top_cleaves"="Sum of reads for top PACs","average"="Percent of top reads") %>%
+  write_csv("/Users/sgorji/Documents/Terminators/terminator_git/terminators/Paper_files/SupplementaryTable8.csv",col_names = TRUE)
+```
+
+
+```{r}
+polyEff %>% right_join(thomasBed2, by='id') %>% 
+  mutate(annotation = ifelse(annotation == "None", "intergenic", annotation)) %>% 
+  mutate(annotation = ifelse(annotation == "3primeUTR", "3UTR", annotation)) %>% 
+  mutate(annotation = ifelse(annotation == "5primeUTR", "5UTR", annotation)) %>% 
+  ggplot(aes(x=as.factor(annotation),y=polyEff, fill=as.factor(annotation))) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 18
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("Cleavage probability") +
+  ylim(c(-.2,1)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio =.5
+  ) +
+  xlab("Annotation of Thomas et al Terminators") +
+  scale_fill_manual(values = pnw_palette("Bay",7)) + 
+  ggtitle("Cleavage probability by genomic annotation")
+```
+```{r}
+polyEff %>% left_join(thomasBed2, by='id') %>% left_join(all_terms, by='id') %>% 
+  mutate(annotation= if_else(Controls=="CDS","CDS control",annotation)) %>%
+  filter(Species=="Arabidopsis") %>%
+  filter(annotation %in% c("coding","CDS control")) 
+```
+
+
+```{r}
+polyEff %>% left_join(thomasBed2, by='id') %>% left_join(all_terms, by='id') %>% 
+  mutate(annotation= if_else(Controls=="CDS","CDS control",annotation)) %>%
+  filter(Species=="Arabidopsis") %>%
+  filter(annotation %in% c("coding","CDS control")) %>%
+  ggplot(aes(x=as.factor(annotation),y=polyEff, fill=as.factor(annotation))) +
+  geom_violin(
+    alpha = 0.5
+    ) +
+  theme_classic(
+    base_size = 15
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    fill = 'white'
+  ) +
+  stat_summary(
+    fun.data = give.n,
+    geom = 'text',
+    size = 14/.pt,
+    position = position_dodge(0.9),
+  ) +
+  ylab("Cleavage probability") +
+  ylim(c(-.1,1.05)) +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    ),
+    legend.position = 'none',
+    aspect.ratio =2
+  ) +
+  xlab("Type of CDS sequence") +
+  scale_fill_manual(values = PNW2) + 
+  geom_signif(comparisons = list(c("CDS control","coding")), y_position = 1.0, vjust = .1,map_signif_level = FALSE) +
+  ggtitle("Cleavage probability") 
+```
+
